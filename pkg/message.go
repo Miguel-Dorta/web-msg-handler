@@ -1,5 +1,13 @@
 package pkg
 
+import (
+	"golang.org/x/sys/unix"
+	"os"
+	"os/signal"
+	"sync"
+	"time"
+)
+
 type msg struct {
 	ReceiverId uint64 `json:"id"`
 	SenderName string `json:"name"`
@@ -7,14 +15,26 @@ type msg struct {
 	Message    string `json:"msg"`
 }
 
-func (m *msg) process() bool {
-	return senders[m.ReceiverId].Send(*m)
-}
+func (m *msg) process(wg *sync.WaitGroup) {
+	quit := make(chan os.Signal)
+	signal.Notify(quit, unix.SIGINT, unix.SIGTERM)
+	it := makeIncrementalTicker(time.Second * 10)
 
-func getChannelContentMsg(c chan msg) []msg {
-	msgs := make([]msg, 0, len(c))
-	for len(c) > 0 {
-		msgs = append(msgs, <-c)
+	for exitLoop := false; !exitLoop; {
+		select {
+		case try := <-it.C:
+			if try > maxTries {
+				exitLoop = true
+				break
+			}
+
+			if senders[m.ReceiverId].Send(*m) {
+				exitLoop = true
+			}
+		case <-quit:
+			exitLoop = true
+			// TODO DUMP
+		}
 	}
-	return msgs
+	wg.Done()
 }
