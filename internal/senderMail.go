@@ -1,4 +1,4 @@
-package src
+package internal
 
 type senderMail struct {
 	Mailto string `json:"mailto"`

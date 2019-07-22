@@ -1,4 +1,4 @@
-package src
+package internal
 
 type request struct {
 	Name string `json:"name"`

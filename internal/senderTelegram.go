@@ -1,4 +1,4 @@
-package src
+package internal
 
 type senderTelegram struct {
 	ChatId   string `json:"chat-id"`
