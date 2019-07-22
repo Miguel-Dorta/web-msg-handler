@@ -1,0 +1,19 @@
+env:
+  - GO111MODULE=on
+builds:
+  - main: cmd/web-msg-handler/main.go
+    binary: web-msg-handler
+    ldflags: -X github.com/Miguel-Dorta/web-msg-handler/internal.Version={{.Version}}
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - 386
+      - arm
+      - arm64
+    goarm:
+      - 5
+      - 6
+      - 7
+archive:
+  format: tar.gz
