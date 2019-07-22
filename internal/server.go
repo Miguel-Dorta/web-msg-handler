@@ -40,7 +40,7 @@ func Run(configFile, port string) {
 		}
 	}()
 
-	Log.Infof("Listening port %s", srv.Addr)
+	Log.Infof("Listening port %s", srv.Addr[1:])
 	if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 		Log.Criticalf("Unexpected error which closed the server: %s", err)
 		os.Exit(1)

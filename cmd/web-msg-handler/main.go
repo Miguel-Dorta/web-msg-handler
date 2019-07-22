@@ -29,17 +29,17 @@ func init() {
 
 func checkFlags() {
 	if port < 0 {
-		_, _ = os.Stderr.WriteString("invalid port")
+		_, _ = fmt.Fprintln(os.Stderr, "invalid port")
 		os.Exit(1)
 	}
 
 	if verbose < 0 || verbose > 4 {
-		_, _ = os.Stderr.WriteString("invalid verbose level")
+		_, _ = fmt.Fprintln(os.Stderr, "invalid verbose level")
 		os.Exit(1)
 	}
 
 	if version {
-		_, _ = os.Stdout.WriteString(internal.Version)
+		_, _ = fmt.Fprintln(os.Stdout, internal.Version)
 		os.Exit(0)
 	}
 }
