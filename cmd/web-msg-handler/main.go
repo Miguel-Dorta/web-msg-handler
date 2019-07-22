@@ -50,7 +50,7 @@ func main() {
 	if logFile == "" {
 		internal.Log = logolang.NewLogger()
 	} else {
-		f, err := os.Open(logFile)
+		f, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "cannot open log file \"%s\": %s", logFile, err)
 			os.Exit(1)
