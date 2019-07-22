@@ -1,0 +1,5 @@
+github.com/Miguel-Dorta/logolang v0.5.1 h1:drWDDA6xmP1eKOtl9jS24PW1bvWapKmThhoIbZ4otGo=
+github.com/Miguel-Dorta/logolang v0.5.1/go.mod h1:ZGbUj/BQ6+M6FmHuXS8T2oZf2vkhRBfbiv1MsN746bI=
+golang.org/x/sys v0.0.0-20190621203818-d432491b9138/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7 h1:LepdCS8Gf/MVejFIt8lsiexZATdoGVyp5bcyS+rYoUI=
+golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
