@@ -28,7 +28,7 @@ func init() {
 }
 
 func checkFlags() {
-	if port < 0 {
+	if port < 0 || port > 65535 {
 		_, _ = fmt.Fprintln(os.Stderr, "invalid port")
 		os.Exit(1)
 	}
