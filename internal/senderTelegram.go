@@ -59,3 +59,7 @@ func (st *senderTelegram) Send(name, mail, msg string) error {
 
 	return nil
 }
+
+func (st *senderTelegram) CheckRecaptcha(resp string) error {
+	return checkRecaptcha(st.RecaptchaSecret, resp)
+}

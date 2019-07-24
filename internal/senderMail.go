@@ -6,9 +6,10 @@ import (
 )
 
 type senderMail struct {
-	Url    string `json:"url"`
-	Mailto string `json:"mailto"`
-	Sender struct {
+	Url             string `json:"url"`
+	RecaptchaSecret string `json:"recaptcha-secret"`
+	Mailto          string `json:"mailto"`
+	Sender          struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 		Hostname string `json:"hostname"`
@@ -44,4 +45,8 @@ func (sm *senderMail) Send(name, mail, msg string) error {
 		return fmt.Errorf("error sending mail: %s", err)
 	}
 	return nil
+}
+
+func (sm *senderMail) CheckRecaptcha(resp string) error {
+	return checkRecaptcha(sm.RecaptchaSecret, resp)
 }

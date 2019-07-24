@@ -93,6 +93,12 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err = s.CheckRecaptcha(r2.Recaptcha); err != nil {
+		Log.Debugf("[Request %d] Recaptcha verification failed: %s", requestId, err)
+		statusWriter(w, http.StatusBadRequest, false, "recaptcha verification failed")
+		return
+	}
+
 	if err = s.Send(r2.Name, r2.Mail, r2.Msg); err != nil {
 		Log.Debugf("[Request %d] Sender failed: %s", requestId, err)
 		statusWriter(w, http.StatusServiceUnavailable, false, "error sending message")
