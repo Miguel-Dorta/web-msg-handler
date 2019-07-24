@@ -1,10 +1,8 @@
 package internal
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 )
 
 const (
@@ -45,32 +43,18 @@ func (st *senderTelegram) Send(name, mail, msg string) error {
 		return fmt.Errorf("error parsing message JSON: %s", err)
 	}
 
-	resp, err := httpClient.Post(telegramBotApiUrl+st.BotToken+sendMsgMethod, mimeJson, bytes.NewReader(data))
+	resp, err := postJson(telegramBotApiUrl+st.BotToken+sendMsgMethod, data)
 	if err != nil {
-		return fmt.Errorf("failed http request: %s", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode >= 400 {
-		return fmt.Errorf("status code %d", resp.StatusCode)
+		return fmt.Errorf("error doing request to Telegram servers: %s", err.Error())
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("error reading response body: %s", err)
-	}
-
-	if err = resp.Body.Close(); err != nil {
-		return fmt.Errorf("error closing response body: %s", err)
-	}
-
-	var bodyJson map[string]interface{}
-	if err = json.Unmarshal(body, &bodyJson); err != nil {
+	var respJson map[string]interface{}
+	if err = json.Unmarshal(resp, &respJson); err != nil {
 		return fmt.Errorf("error parsing response JSON: %s", err)
 	}
 
-	if !bodyJson["ok"].(bool) {
-		return fmt.Errorf("request failed: %s", body)
+	if !respJson["ok"].(bool) {
+		return fmt.Errorf("request failed: %s", resp)
 	}
 
 	return nil
