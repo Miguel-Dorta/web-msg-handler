@@ -27,17 +27,17 @@ type messageSend struct {
 	DisableWebImagePreview bool   `json:"disable_web_page_preview"`
 }
 
-func createMessage(url, name, mail, msg string) string {
+func (st *senderTelegram) createMessage(name, mail, msg string) string {
 	return fmt.Sprintf(
-		"Message from %s\n\nName: %s\nEmail: %s\nMessage: %s",
-		url, name, mail, msg,
+		"Message from %s\n\n*Name*: %s\n*Email*: %s\n*Message*: %s",
+		st.Url, name, mail, msg,
 	)
 }
 
 func (st *senderTelegram) Send(name, mail, msg string) error {
 	data, err := json.Marshal(messageSend{
 		ChatId:                 st.ChatId,
-		Text:                   createMessage(st.Url, name, mail, msg),
+		Text:                   st.createMessage(name, mail, msg),
 		ParseMode:              parseModeMarkdown,
 		DisableWebImagePreview: true,
 	})
