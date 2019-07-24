@@ -12,13 +12,13 @@ type config struct {
 }
 
 type sitesTelegram struct {
-	Id     uint64         `json:"id"`
-	Sender senderTelegram `json:"sender"`
+	Id   uint64         `json:"id"`
+	Site senderTelegram `json:"site"`
 }
 
 type sitesMail struct {
-	Id     uint64     `json:"id"`
-	Sender senderMail `json:"sender"`
+	Id   uint64     `json:"id"`
+	Site senderMail `json:"site"`
 }
 
 func loadConfig(path string) error {
@@ -38,14 +38,14 @@ func loadConfig(path string) error {
 		if _, exists := senders[stg.Id]; exists {
 			return fmt.Errorf("conflicting IDs in config file (ID: %d)", stg.Id)
 		}
-		senders[stg.Id] = &stg.Sender
+		senders[stg.Id] = &stg.Site
 	}
 
 	for _, sm := range c.SitesMail {
 		if _, exists := senders[sm.Id]; exists {
 			return fmt.Errorf("conflicting IDs in config file (ID: %d)", sm.Id)
 		}
-		senders[sm.Id] = &sm.Sender
+		senders[sm.Id] = &sm.Site
 	}
 
 	return nil
