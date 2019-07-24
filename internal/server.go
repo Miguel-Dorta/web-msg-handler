@@ -19,6 +19,8 @@ const (
 	statusUnknownError = 502
 )
 
+var httpClient = http.Client{Timeout: 10 * time.Second}
+
 func Run(configFile, port string) {
 	if err := loadConfig(configFile); err != nil {
 		Log.Criticalf("error loading config file: %s", err)
@@ -93,8 +95,8 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !s.Send(r2.Name, r2.Mail, r2.Msg) {
-		Log.Debugf("[Request %d] Sender failed", requestId)
+	if err = s.Send(r2.Name, r2.Mail, r2.Msg); err != nil {
+		Log.Debugf("[Request %d] Sender failed: %s", requestId, err)
 		statusWriter(w, http.StatusServiceUnavailable, false, "error sending message")
 		return
 	}
