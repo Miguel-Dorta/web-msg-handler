@@ -19,8 +19,6 @@ const (
 	statusUnknownError = 502
 )
 
-var httpClient = http.Client{Timeout: 10 * time.Second}
-
 func Run(configFile, port string) {
 	if err := loadConfig(configFile); err != nil {
 		Log.Criticalf("error loading config file: %s", err)
