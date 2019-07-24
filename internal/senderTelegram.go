@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 )
 
 const (
@@ -15,9 +14,10 @@ const (
 )
 
 type senderTelegram struct {
-	Url      string `json:"url"`
-	ChatId   string `json:"chat-id"`
-	BotToken string `json:"bot-token"`
+	Url             string `json:"url"`
+	RecaptchaSecret string `json:"recaptcha-secret"`
+	ChatId          string `json:"chat-id"`
+	BotToken        string `json:"bot-token"`
 }
 
 type messageSend struct {
@@ -45,18 +45,11 @@ func (st *senderTelegram) Send(name, mail, msg string) error {
 		return fmt.Errorf("error parsing message JSON: %s", err)
 	}
 
-	req, err := http.NewRequest(http.MethodPost, telegramBotApiUrl + st.BotToken + sendMsgMethod, bytes.NewReader(data))
-	if err != nil {
-		return fmt.Errorf("error creating request: %s", err)
-	}
-	req.Header.Set(mimeContentType, mimeJson)
-
-	resp, err := httpClient.Post(telegramBotApiUrl + st.BotToken + sendMsgMethod, mimeJson, bytes.NewReader(data))
+	resp, err := httpClient.Post(telegramBotApiUrl+st.BotToken+sendMsgMethod, mimeJson, bytes.NewReader(data))
 	if err != nil {
 		return fmt.Errorf("failed http request: %s", err)
 	}
 	defer resp.Body.Close()
-
 
 	if resp.StatusCode >= 400 {
 		return fmt.Errorf("status code %d", resp.StatusCode)
