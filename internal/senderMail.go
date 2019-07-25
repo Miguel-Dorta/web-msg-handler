@@ -39,8 +39,8 @@ func (sm *senderMail) createMessage(name, mail, msg string) []byte {
 		sm.Sender.Username,
 		sm.Mailto,
 		sm.Url,
-		html.EscapeString(name), // TODO check for non-printable characters
-		html.EscapeString(mail), // TODO check mail
+		html.EscapeString(name),
+		html.EscapeString(mail),
 		lfToBr(html.EscapeString(msg)),
 	))
 }

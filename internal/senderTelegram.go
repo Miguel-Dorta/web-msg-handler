@@ -34,8 +34,8 @@ func (st *senderTelegram) createMessage(name, mail, msg string) string {
 			"<b>Email</b>: %s\n" +
 			"<b>Message</b>: %s",
 		st.Url,
-		html.EscapeString(name), // TODO check for non-printable characters
-		html.EscapeString(mail), // TODO check mail
+		html.EscapeString(name),
+		html.EscapeString(mail),
 		html.EscapeString(msg),
 	)
 }

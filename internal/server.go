@@ -9,8 +9,11 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"strconv"
+	"strings"
 	"time"
+	"unicode"
 )
 
 const (
@@ -18,6 +21,8 @@ const (
 	mimeJson           = "application/json"
 	statusUnknownError = 502
 )
+
+var regexMail = regexp.MustCompile("[-0-9A-Za-z!#$%&'*+\\/=?^_`{|}~.]+@[-0-9A-Za-z_.~]+[.][A-Za-z]+")
 
 func Run(configFile, port string) {
 	if err := loadConfig(configFile); err != nil {
@@ -99,7 +104,17 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.Send(r2.Name, r2.Mail, r2.Msg); err != nil {
+	if !regexMail.MatchString(r2.Mail) {
+		Log.Debugf("[Request %d] Invalid email", requestId)
+		statusWriter(w, http.StatusBadRequest, false, "invalid email")
+		return
+	}
+
+	// Sanitize inputs
+	name := removeNonPrintableChars(r2.Name)
+	msg := removeNonPrintableChars(r2.Msg)
+
+	if err = s.Send(name, r2.Mail, msg); err != nil {
 		Log.Debugf("[Request %d] Sender failed: %s", requestId, err)
 		statusWriter(w, http.StatusServiceUnavailable, false, "error sending message")
 		return
@@ -121,4 +136,13 @@ func statusWriter(w http.ResponseWriter, statusCode int, success bool, msg strin
 	if _, err := w.Write(data); err != nil {
 		Log.Errorf("error writing response: %s", err)
 	}
+}
+
+func removeNonPrintableChars(str string) string {
+	return strings.Map(func(r rune) rune {
+		if unicode.IsPrint(r) || unicode.IsControl(r) {
+			return r
+		}
+		return -1
+	}, str)
 }
