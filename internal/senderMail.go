@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html"
 	"net/smtp"
+	"strings"
 )
 
 type senderMail struct {
@@ -16,6 +17,11 @@ type senderMail struct {
 		Hostname string `json:"hostname"`
 		Port     string `json:"port"`
 	} `json:"sender"`
+}
+
+func lfToBr(str string) string {
+	replacer := strings.NewReplacer("\r", "", "\n", "<br>")
+	return replacer.Replace(str)
 }
 
 func (sm *senderMail) createMessage(name, mail, msg string) []byte {
@@ -35,7 +41,7 @@ func (sm *senderMail) createMessage(name, mail, msg string) []byte {
 		sm.Url,
 		html.EscapeString(name), // TODO check for non-printable characters
 		html.EscapeString(mail), // TODO check mail
-		html.EscapeString(msg), // TODO replace \n & \r\n for <br> after escaping
+		lfToBr(html.EscapeString(msg)),
 	))
 }
 
