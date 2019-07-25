@@ -3,12 +3,13 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"html"
 )
 
 const (
 	telegramBotApiUrl = "https://api.telegram.org/bot"
 	sendMsgMethod     = "/sendMessage"
-	parseModeMarkdown = "Markdown"
+	parseModeHtml     = "HTML"
 )
 
 type senderTelegram struct {
@@ -27,8 +28,15 @@ type messageSend struct {
 
 func (st *senderTelegram) createMessage(name, mail, msg string) string {
 	return fmt.Sprintf(
-		"Message from %s\n\n*Name*: %s\n*Email*: %s\n*Message*: %s",
-		st.Url, name, mail, msg,
+		"Message from %s\n" +
+			"\n" +
+			"<b>Name</b>: %s\n" +
+			"<b>Email</b>: %s\n" +
+			"<b>Message</b>: %s",
+		st.Url,
+		html.EscapeString(name), // TODO check for non-printable characters
+		html.EscapeString(mail), // TODO check mail
+		html.EscapeString(msg),
 	)
 }
 
@@ -36,7 +44,7 @@ func (st *senderTelegram) Send(name, mail, msg string) error {
 	data, err := json.Marshal(messageSend{
 		ChatId:                 st.ChatId,
 		Text:                   st.createMessage(name, mail, msg),
-		ParseMode:              parseModeMarkdown,
+		ParseMode:              parseModeHtml,
 		DisableWebImagePreview: true,
 	})
 	if err != nil {

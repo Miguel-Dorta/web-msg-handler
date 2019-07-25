@@ -2,6 +2,7 @@ package internal
 
 import (
 	"fmt"
+	"html"
 	"net/smtp"
 )
 
@@ -19,17 +20,22 @@ type senderMail struct {
 
 func (sm *senderMail) createMessage(name, mail, msg string) []byte {
 	return []byte(fmt.Sprintf(
-		"From: %s\r\n"+
+			"From: %s\r\n"+
 			"To: %s\r\n"+
 			"Subject: Message from %s\r\n"+
+			"Content-Type: text/html; charset=UTF-8\r\n" +
 			"\r\n"+
-			"Name: %s\r\n"+
-			"Email: %s\r\n"+
-			"Message: %s\r\n",
+			"<html><body>" +
+			"<b>Name</b>: %s<br>"+
+			"<b>Email</b>: %s<br>"+
+			"<b>Message</b>: %s" +
+			"</body></html>\r\n",
 		sm.Sender.Username,
 		sm.Mailto,
 		sm.Url,
-		name, mail, msg,
+		html.EscapeString(name), // TODO check for non-printable characters
+		html.EscapeString(mail), // TODO check mail
+		html.EscapeString(msg), // TODO replace \n & \r\n for <br> after escaping
 	))
 }
 
