@@ -1,0 +1,52 @@
+{
+  "telegram-sites": [
+    {
+      "id": 5577006791947779410,
+      "site": {
+        "url": "website1.com",
+        "recaptcha-secret": "Uv38ByGCZU8WP18PmmIdcpVmx00QA3xNe7sEB9Hi",
+        "chat-id": "9167320",
+        "bot-token": "123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11"
+      }
+    },
+    {
+      "id": 15352856648520921629,
+      "site": {
+        "url": "website2.org",
+        "recaptcha-secret": "xkmBhVrYaB0NhtHpHgAWeTnLZpTSxCKs0gigByk5",
+        "chat-id": "87745566",
+        "bot-token": "654321:ABC-DEF1234ghIkl-zyx57W2v1u123ew12"
+      }
+    }
+  ],
+  "mail-sites": [
+    {
+      "id": 8674665223082153551,
+      "site": {
+        "url": "website3.com",
+        "recaptcha-secret": "SH9pmeudGKRHhARdh_PGfPInRumVr1olNnlRuqL_",
+        "mailto": "contact@website3.com",
+        "sender": {
+          "username": "no-reply@website3.com",
+          "password": "bNRxxIPxX7kLrbN8WCG22VUmpBqVBGgLTnyLdjob",
+          "hostname": "smtp.website3.com",
+          "port": "587"
+        }
+      }
+    },
+    {
+      "id": 13260572831089785859,
+      "site": {
+        "url": "website4.net",
+        "recaptcha-secret": "HUnUlVyEhiFjJSU_7HON16nii_khEZwWDwcCRIYV",
+        "mailto": "personal-mail@gmail.com",
+        "sender": {
+          "username": "contact-forms@website4.net",
+          "password": "u9oIMT9qjrZo0gv1BZh1kh5milvfLH_EhEWS0lcr",
+          "hostname": "mail.website4.net",
+          "port": "25"
+        }
+      }
+    }
+  ]
+}
