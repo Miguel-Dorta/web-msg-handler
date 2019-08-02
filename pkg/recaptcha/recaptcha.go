@@ -4,35 +4,36 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/client"
 )
 
 const recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify"
 
-type recaptchaRequest struct {
+type request struct {
 	Secret string `json:"secret"`
 	Response string `json:"response"`
 }
 
-type recaptchaResponse struct {
+type response struct {
 	Success bool `json:"success"`
 	Errors []string `json:"error-codes"`
 }
 
-func checkRecaptcha(secret, response string) error {
-	data, err := json.Marshal(recaptchaRequest{
-		Secret: secret,
-		Response: response,
+func CheckRecaptcha(secret, userResponse string) error {
+	data, err := json.Marshal(request{
+		Secret:   secret,
+		Response: userResponse,
 	})
 	if err != nil {
 		return fmt.Errorf("error parsing recaptcha request JSON: %s", err.Error())
 	}
 
-	rawResp, err := postJson(recaptchaVerifyUrl, data)
+	rawResp, err := client.PostJSON(recaptchaVerifyUrl, data)
 	if err != nil {
 		return fmt.Errorf("error doing request for reCaptcha verification: %s", err.Error())
 	}
 
-	var resp recaptchaResponse
+	var resp response
 	if err = json.Unmarshal(rawResp, &resp); err != nil {
 		return fmt.Errorf("error parsing reCaptcha server response: %s", err.Error())
 	}
