@@ -1,10 +1,13 @@
-package internal
+package server
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/Miguel-Dorta/logolang"
 	"github.com/Miguel-Dorta/web-msg-handler/api"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/config"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/sanitation"
 	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"net/http"
@@ -23,10 +26,11 @@ const (
 	statusUnknownError = 502
 )
 
-var regexMail = regexp.MustCompile("[-0-9A-Za-z!#$%&'*+\\/=?^_`{|}~.]+@[-0-9A-Za-z_.~]+[.][A-Za-z]+")
+var Log *logolang.Logger
 
 func Run(configFile, port string) {
-	if err := loadConfig(configFile); err != nil {
+	sites, err := config.LoadConfig(configFile)
+	if err != nil {
 		Log.Criticalf("error loading config file: %s", err)
 		os.Exit(1)
 	}
@@ -105,17 +109,13 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !regexMail.MatchString(r2.Mail) {
+	if !sanitation.IsValidMail(r2.Mail) {
 		Log.Debugf("[Request %d] Invalid email", requestId)
 		statusWriter(w, http.StatusBadRequest, false, "invalid email")
 		return
 	}
 
-	// Sanitize inputs
-	name := removeNonPrintableChars(r2.Name)
-	msg := removeNonPrintableChars(r2.Msg)
-
-	if err = s.Send(name, r2.Mail, msg); err != nil {
+	if err = s.Send(sanitation.SanitizeName(r2.Name), r2.Mail, sanitation.SanitizeMsg(r2.Msg)); err != nil {
 		Log.Debugf("[Request %d] Sender failed: %s", requestId, err)
 		statusWriter(w, http.StatusServiceUnavailable, false, "error sending message")
 		return
@@ -137,13 +137,4 @@ func statusWriter(w http.ResponseWriter, statusCode int, success bool, msg strin
 	if _, err := w.Write(data); err != nil {
 		Log.Errorf("error writing response: %s", err)
 	}
-}
-
-func removeNonPrintableChars(str string) string {
-	return strings.Map(func(r rune) rune {
-		if unicode.IsPrint(r) || unicode.IsControl(r) {
-			return r
-		}
-		return -1
-	}, str)
 }
