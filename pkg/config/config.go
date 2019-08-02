@@ -2,14 +2,34 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sender"
 	"io/ioutil"
 )
 
 type config struct {
-	SitesTg   []sitesTelegram `json:"telegram-sites"`
-	SitesMail []sitesMail     `json:"mail-sites"`
+	Sites []site `json:"sites"`
+}
+
+type site struct {
+	ID              uint64      `json:"id"`
+	URL             string      `json:"url"`
+	RecaptchaSecret string      `json:"recaptcha-secret"`
+	Sender          interface{} `json:"sender"`
+}
+
+type mail struct {
+	Mailto   string `json:"mailto"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Hostname string `json:"hostname"`
+	Port     string `json:"port"`
+}
+
+type telegram struct {
+	ChatID   string `json:"chat-id"`
+	BotToken string `json:"bot-token"`
 }
 
 func LoadConfig(path string) (map[uint64]sender.Sender, error) {
@@ -23,22 +43,36 @@ func LoadConfig(path string) (map[uint64]sender.Sender, error) {
 		return nil, fmt.Errorf("error parsing config file from path \"%s\": %s", path, err)
 	}
 
-	senders := make(map[uint64]sender.Sender, len(c.SitesMail) + len(c.SitesTg))
+	senders := make(map[uint64]sender.Sender, len(c.Sites))
 
-	for _, stg := range c.SitesTg {
-		if _, exists := senders[stg.Id]; exists {
-			return nil, fmt.Errorf("conflicting IDs in config file (ID: %d)", stg.Id)
+	for _, s := range c.Sites {
+		var parsedSender sender.Sender
+		if mailSender, ok := s.Sender.(*mail); ok {
+			parsedSender = &sender.Mail{
+				Url:             s.URL,
+				RecaptchaSecret: s.RecaptchaSecret,
+				Mailto:          mailSender.Mailto,
+				Username:        mailSender.Username,
+				Password:        mailSender.Password,
+				Hostname:        mailSender.Hostname,
+				Port:            mailSender.Port,
+			}
+		} else if telegramSender, ok := s.Sender.(*telegram); ok {
+			parsedSender = &sender.Telegram{
+				Url:             s.URL,
+				RecaptchaSecret: s.RecaptchaSecret,
+				ChatId:          telegramSender.ChatID,
+				BotToken:        telegramSender.BotToken,
+			}
+		} else {
+			return nil, errors.New("error parsing config file: invalid sender")
 		}
-		senders[stg.Id] = &stg.Site
-	}
 
-	for _, sm := range c.SitesMail {
-		if _, exists := senders[sm.Id]; exists {
-			return nil, fmt.Errorf("conflicting IDs in config file (ID: %d)", sm.Id)
+		if _, exists := senders[s.ID]; exists {
+			return nil, fmt.Errorf("conflicting IDs in config file (ID: %d)", s.ID)
 		}
-		senders[sm.Id] = &sm.Site
+		senders[s.ID] = parsedSender
 	}
 
 	return senders, nil
 }
-

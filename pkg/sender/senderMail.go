@@ -11,12 +11,10 @@ type Mail struct {
 	Url             string `json:"url"`
 	RecaptchaSecret string `json:"recaptcha-secret"`
 	Mailto          string `json:"mailto"`
-	Sender          struct {
-		Username string `json:"username"`
-		Password string `json:"password"`
-		Hostname string `json:"hostname"`
-		Port     string `json:"port"`
-	} `json:"sender"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Hostname string `json:"hostname"`
+	Port     string `json:"port"`
 }
 
 func lfToBr(str string) string {
@@ -36,7 +34,7 @@ func (sm *Mail) createMessage(name, mail, msg string) []byte {
 			"<b>Email</b>: %s<br>"+
 			"<b>Message</b>: %s" +
 			"</body></html>\r\n",
-		sm.Sender.Username,
+		sm.Username,
 		sm.Mailto,
 		sm.Url,
 		html.EscapeString(name),
@@ -47,9 +45,9 @@ func (sm *Mail) createMessage(name, mail, msg string) []byte {
 
 func (sm *Mail) Send(name, mail, msg string) error {
 	err := smtp.SendMail(
-		sm.Sender.Hostname+":"+sm.Sender.Port,
-		smtp.PlainAuth("", sm.Sender.Username, sm.Sender.Password, sm.Sender.Hostname),
-		sm.Sender.Username,
+		sm.Hostname+":"+sm.Port,
+		smtp.PlainAuth("", sm.Username, sm.Password, sm.Hostname),
+		sm.Username,
 		[]string{sm.Mailto},
 		sm.createMessage(name, mail, msg),
 	)
