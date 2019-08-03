@@ -3,6 +3,8 @@ package sender
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/client"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/recaptcha"
 	"html"
 )
 
@@ -13,36 +15,26 @@ const (
 )
 
 type Telegram struct {
-	Url             string `json:"url"`
+	URL             string `json:"url"`
 	RecaptchaSecret string `json:"recaptcha-secret"`
 	ChatId          string `json:"chat-id"`
 	BotToken        string `json:"bot-token"`
 }
 
-type messageSend struct {
-	ChatId                 string `json:"chat_id"`
+type requestJSON struct {
+	ChatID                 string `json:"chat_id"`
 	Text                   string `json:"text"`
 	ParseMode              string `json:"parse_mode"`
 	DisableWebImagePreview bool   `json:"disable_web_page_preview"`
 }
 
-func (st *Telegram) createMessage(name, mail, msg string) string {
-	return fmt.Sprintf(
-		"Message from %s\n" +
-			"\n" +
-			"<b>Name</b>: %s\n" +
-			"<b>Email</b>: %s\n" +
-			"<b>Message</b>: %s",
-		st.Url,
-		html.EscapeString(name),
-		html.EscapeString(mail),
-		html.EscapeString(msg),
-	)
+func (st *Telegram) CheckRecaptcha(resp string) error {
+	return recaptcha.CheckRecaptcha(st.RecaptchaSecret, resp)
 }
 
 func (st *Telegram) Send(name, mail, msg string) error {
-	data, err := json.Marshal(messageSend{
-		ChatId:                 st.ChatId,
+	data, err := json.Marshal(requestJSON{
+		ChatID:                 st.ChatId,
 		Text:                   st.createMessage(name, mail, msg),
 		ParseMode:              parseModeHtml,
 		DisableWebImagePreview: true,
@@ -51,7 +43,7 @@ func (st *Telegram) Send(name, mail, msg string) error {
 		return fmt.Errorf("error parsing message JSON: %s", err)
 	}
 
-	resp, err := postJson(telegramBotApiUrl+st.BotToken+sendMsgMethod, data)
+	resp, err := client.PostJSON(telegramBotApiUrl+st.BotToken+sendMsgMethod, data)
 	if err != nil {
 		return fmt.Errorf("error doing request to Telegram servers: %s", err.Error())
 	}
@@ -68,7 +60,16 @@ func (st *Telegram) Send(name, mail, msg string) error {
 	return nil
 }
 
-func (st *Telegram) CheckRecaptcha(resp string) error {
-	return checkRecaptcha(st.RecaptchaSecret, resp)
+func (st *Telegram) createMessage(name, mail, msg string) string {
+	return fmt.Sprintf(
+		"Message from %s\n" +
+			"\n" +
+			"<b>Name</b>: %s\n" +
+			"<b>Email</b>: %s\n" +
+			"<b>Message</b>: %s",
+		st.URL,
+		html.EscapeString(name),
+		html.EscapeString(mail),
+		html.EscapeString(msg),
+	)
 }
-

@@ -49,7 +49,7 @@ func LoadConfig(path string) (map[uint64]sender.Sender, error) {
 		var parsedSender sender.Sender
 		if mailSender, ok := s.Sender.(*mail); ok {
 			parsedSender = &sender.Mail{
-				Url:             s.URL,
+				URL:             s.URL,
 				RecaptchaSecret: s.RecaptchaSecret,
 				Mailto:          mailSender.Mailto,
 				Username:        mailSender.Username,
@@ -59,7 +59,7 @@ func LoadConfig(path string) (map[uint64]sender.Sender, error) {
 			}
 		} else if telegramSender, ok := s.Sender.(*telegram); ok {
 			parsedSender = &sender.Telegram{
-				Url:             s.URL,
+				URL:             s.URL,
 				RecaptchaSecret: s.RecaptchaSecret,
 				ChatId:          telegramSender.ChatID,
 				BotToken:        telegramSender.BotToken,
