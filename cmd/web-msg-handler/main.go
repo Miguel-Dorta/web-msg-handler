@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/Miguel-Dorta/logolang"
 	"github.com/Miguel-Dorta/web-msg-handler/internal"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/server"
 	"os"
 	"strconv"
 )
@@ -47,20 +48,20 @@ func checkFlags() {
 func main() {
 	checkFlags()
 
-	if logFile == "" {
-		internal.Log = logolang.NewLogger()
-	} else {
+	logger := logolang.NewLogger()
+	if logFile != "" {
 		f, err := os.OpenFile(logFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			_, _ = fmt.Fprintf(os.Stderr, "cannot open log file \"%s\": %s", logFile, err)
 			os.Exit(1)
 		}
 		safeF := &logolang.SafeWriter{W: f}
-		internal.Log = logolang.NewLoggerWriters(safeF, safeF, safeF, safeF)
+		logger = logolang.NewLoggerWriters(safeF, safeF, safeF, safeF)
 	}
-	internal.Log.Color = false
-	internal.Log.Level = verbose
+	logger.Color = false
+	logger.Level = verbose
 
-	internal.Run(configPath, strconv.Itoa(port))
+	server.Log = logger
+	server.Run(configPath, strconv.Itoa(port))
 }
 
