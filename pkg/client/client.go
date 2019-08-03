@@ -8,10 +8,12 @@ import (
 	"time"
 )
 
+const mimeJSON = "application/json"
+
 var c = http.Client{Timeout: 10 * time.Second}
 
 func PostJSON(url string, data []byte) ([]byte, error) {
-	resp, err := c.Post(url, mimeJson, bytes.NewReader(data))
+	resp, err := c.Post(url, mimeJSON, bytes.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("failed http request: %s", err)
 	}
