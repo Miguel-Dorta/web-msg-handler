@@ -3,17 +3,16 @@ package client
 import (
 	"bytes"
 	"fmt"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg"
 	"io/ioutil"
 	"net/http"
 	"time"
 )
 
-const mimeJSON = "application/json"
-
 var c = http.Client{Timeout: 10 * time.Second}
 
 func PostJSON(url string, data []byte) ([]byte, error) {
-	resp, err := c.Post(url, mimeJSON, bytes.NewReader(data))
+	resp, err := c.Post(url, pkg.MimeJSON, bytes.NewReader(data))
 	if err != nil {
 		return nil, fmt.Errorf("failed http request: %s", err)
 	}

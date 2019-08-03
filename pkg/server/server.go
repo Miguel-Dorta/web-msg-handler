@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/Miguel-Dorta/logolang"
 	"github.com/Miguel-Dorta/web-msg-handler/api"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/config"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sanitation"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sender"
@@ -18,11 +19,7 @@ import (
 	"time"
 )
 
-const (
-	mimeContentType    = "Content-Type"
-	mimeJSON           = "application/json"
-	statusUnknownError = 502
-)
+const statusUnknownError = 502
 
 var (
 	Log *logolang.Logger
@@ -85,7 +82,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if contentType := r.Header.Get(mimeContentType); contentType != mimeJSON {
+	if contentType := r.Header.Get(pkg.MimeContentType); contentType != pkg.MimeJSON {
 		Log.Debugf("[Request %d] Invalid content type: %s", requestID, contentType)
 		statusWriter(w, http.StatusBadRequest, false, fmt.Sprintf("content-type %s not supported", contentType))
 		return
@@ -128,7 +125,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 }
 
 func statusWriter(w http.ResponseWriter, statusCode int, success bool, msg string) {
-	w.Header().Set(mimeContentType, mimeJSON)
+	w.Header().Set(pkg.MimeContentType, pkg.MimeJSON)
 	w.WriteHeader(statusCode)
 
 	data, _ := json.Marshal(api.Response{
