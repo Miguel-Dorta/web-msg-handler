@@ -11,30 +11,32 @@ import (
 )
 
 var (
-	configPath string
-	logFile string
-	port int
-	verbose int
-	version bool
+	configPath   string
+	logFile      string
+	port         int
+	verboseLevel int
+	version      bool
 )
 
 func init() {
 	flag.StringVar(&configPath, "config", "config.json", "set config path")
 	flag.StringVar(&logFile, "log-file", "", "set log file")
 	flag.IntVar(&port, "port", 8080, "set port")
-	flag.IntVar(&verbose, "verbose", 2, "set verbose level. 0=no-log, 1=critical, 2=errors, 3=info, 4 debug")
+	flag.IntVar(&verboseLevel, "verbose", 2, "set verbose level. 0=no-log, 1=critical, 2=errors, 3=info, 4 debug")
 	flag.BoolVar(&version, "version", false, "print version and exit")
 
 	flag.Parse()
 }
 
+// checkFlags checks if the values assigned to the parsed flags are valid.
+// It will also print version and exit if that flag is set to true.
 func checkFlags() {
 	if port < 0 || port > 65535 {
 		_, _ = fmt.Fprintln(os.Stderr, "invalid port")
 		os.Exit(1)
 	}
 
-	if verbose < 0 || verbose > 4 {
+	if verboseLevel < 0 || verboseLevel > 4 {
 		_, _ = fmt.Fprintln(os.Stderr, "invalid verbose level")
 		os.Exit(1)
 	}
@@ -59,7 +61,7 @@ func main() {
 		logger = logolang.NewLoggerWriters(safeF, safeF, safeF, safeF)
 	}
 	logger.Color = false
-	logger.Level = verbose
+	logger.Level = verboseLevel
 
 	server.Log = logger
 	server.Run(configPath, strconv.Itoa(port))
