@@ -1,4 +1,5 @@
 package client
+// Package client represents the HTTP client that is used internally by web-msg-handler to make HTTP request.
 
 import (
 	"bytes"

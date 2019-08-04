@@ -1,4 +1,5 @@
 package server
+// Package server will manage all the HTTP request made to web-msg-handler.
 
 import (
 	"context"
@@ -26,6 +27,9 @@ var (
 	sites map[uint64]sender.Sender
 )
 
+// Run will start a HTTP server in the port provided using the config file path provided.
+// It ends when a termination or interrupt signal is received.
+// It can end the program execution prematurely.
 func Run(configFile, port string) {
 	var err error
 	sites, err = config.LoadConfig(configFile)
@@ -56,6 +60,26 @@ func Run(configFile, port string) {
 	}
 }
 
+// handle is the function executed for each HTTP request received by web-msg-handler.
+//
+// It will:
+//
+// - Assign an ID to every request (corresponding to a timestamp of the EPOCH nanosecond when it was received
+// for debugging and logging purposes.
+//
+// - Check if the Sender ID is correct
+//
+// - Check if the HTTP method used is POST
+//
+// - Check if the Content-Type header is the MIME JSON.
+//
+// - Check if the request body is valid.
+//
+// - Check if the email provided is valid.
+//
+// - Check if the request have passed the ReCaptcha verification.
+//
+// - Send the message
 func handle(w http.ResponseWriter, r *http.Request) {
 	// Request ID for logging purposes
 	requestID := time.Now().UnixNano()
@@ -102,15 +126,15 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = s.CheckRecaptcha(r2.Recaptcha); err != nil {
-		Log.Debugf("[Request %d] Recaptcha verification failed: %s", requestID, err)
-		statusWriter(w, http.StatusBadRequest, false, "recaptcha verification failed")
-		return
-	}
-
 	if !sanitation.IsValidMail(r2.Mail) {
 		Log.Debugf("[Request %d] Invalid email", requestID)
 		statusWriter(w, http.StatusBadRequest, false, "invalid email")
+		return
+	}
+
+	if err = s.CheckRecaptcha(r2.Recaptcha); err != nil {
+		Log.Debugf("[Request %d] Recaptcha verification failed: %s", requestID, err)
+		statusWriter(w, http.StatusBadRequest, false, "recaptcha verification failed")
 		return
 	}
 
@@ -124,6 +148,9 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	Log.Debugf("[Request %d] Success", requestID)
 }
 
+// statusWriter will write a response to the http.ResponseWriter provided.
+// That response will be sent with the status code provided,
+// and its body will consists in a JSON represented by api.Response with the success status and error provided.
 func statusWriter(w http.ResponseWriter, statusCode int, success bool, msg string) {
 	w.Header().Set(pkg.MimeContentType, pkg.MimeJSON)
 	w.WriteHeader(statusCode)

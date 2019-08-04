@@ -1,4 +1,5 @@
 package config
+// Package config is the package that manages the functions related to the config file of web-msg-handler.
 
 import (
 	"encoding/json"
@@ -8,10 +9,13 @@ import (
 	"io/ioutil"
 )
 
+// config represents the main structure of the config file of web-msg-handler.
+// It consists in an array of sites.
 type config struct {
 	Sites []site `json:"sites"`
 }
 
+// site represents the configuration of each site that web-msg-handler will be listen.
 type site struct {
 	ID              uint64      `json:"id"`
 	URL             string      `json:"url"`
@@ -19,6 +23,7 @@ type site struct {
 	Sender          interface{} `json:"sender"`
 }
 
+// mail represents the variable type "sender" of site when it represents an email sender.
 type mail struct {
 	Mailto   string `json:"mailto"`
 	Username string `json:"username"`
@@ -27,11 +32,13 @@ type mail struct {
 	Port     string `json:"port"`
 }
 
+// telegram represents the variable type "sender" of site when it represents a telegram sender.
 type telegram struct {
 	ChatID   string `json:"chat-id"`
 	BotToken string `json:"bot-token"`
 }
 
+// LoadConfig will read the config from the path provided and return a map of sender.Sender with uint64 key.
 func LoadConfig(path string) (map[uint64]sender.Sender, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {

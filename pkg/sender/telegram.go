@@ -14,6 +14,7 @@ const (
 	parseModeHtml     = "HTML"
 )
 
+// Telegram represents a type that implements the Sender interface that send forms via Telegram Bot API
 type Telegram struct {
 	URL             string `json:"url"`
 	RecaptchaSecret string `json:"recaptcha-secret"`
@@ -21,6 +22,7 @@ type Telegram struct {
 	BotToken        string `json:"bot-token"`
 }
 
+// requestJSON represents the request that Telegram.Send() will do to the Telegram Bot API
 type requestJSON struct {
 	ChatID                 string `json:"chat_id"`
 	Text                   string `json:"text"`
@@ -28,10 +30,13 @@ type requestJSON struct {
 	DisableWebImagePreview bool   `json:"disable_web_page_preview"`
 }
 
+// CheckRecaptcha will check if the ReCaptcha response provided have passed the ReCaptcha verification using its
+// internal secret.
 func (st *Telegram) CheckRecaptcha(resp string) error {
 	return recaptcha.CheckRecaptcha(st.RecaptchaSecret, resp)
 }
 
+// Send will send the form provided via Telegram Bot API
 func (st *Telegram) Send(name, mail, msg string) error {
 	data, err := json.Marshal(requestJSON{
 		ChatID:                 st.ChatId,
@@ -60,6 +65,7 @@ func (st *Telegram) Send(name, mail, msg string) error {
 	return nil
 }
 
+// createMessage will return an string containing a styled message from the form provided.
 func (st *Telegram) createMessage(name, mail, msg string) string {
 	return fmt.Sprintf(
 		"Message from %s\n" +

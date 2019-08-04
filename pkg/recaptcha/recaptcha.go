@@ -1,4 +1,5 @@
 package recaptcha
+// Package recaptcha is the package that manages the function related to the Google's ReCaptcha verification.
 
 import (
 	"encoding/json"
@@ -9,16 +10,21 @@ import (
 
 const recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify"
 
+// request represents the request that web-msg-handler do to Google's ReCaptcha servers in order to verify
+// whether a request passed the ReCaptcha verification.
 type request struct {
 	Secret string `json:"secret"`
 	Response string `json:"response"`
 }
 
+// response represents the response that Google's ReCaptcha servers returns telling if the request sent+
+// passes the ReCaptcha verification.
 type response struct {
 	Success bool `json:"success"`
 	Errors []string `json:"error-codes"`
 }
 
+// CheckRecaptcha checks if the response provided have passed the ReCaptcha verification with the secret provided.
 func CheckRecaptcha(secret, userResponse string) error {
 	data, err := json.Marshal(request{
 		Secret:   secret,
