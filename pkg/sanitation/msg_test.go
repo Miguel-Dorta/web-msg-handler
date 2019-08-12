@@ -9,8 +9,7 @@ func TestSanitizeMsg(t *testing.T) {
 	expected := `this is a literal text
 it has control and printable characters
 except the characters following #99:`
-	// TODO append non printable nor control characters
-	result := sanitation.SanitizeMsg(expected + string(23))
+	result := sanitation.SanitizeMsg(expected + string(28))
 	if result != expected {
 		t.Errorf("Invalid sanitation.\n" +
 			"-> Expected output: \"%s\"\n" +

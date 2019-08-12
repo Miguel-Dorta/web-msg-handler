@@ -7,7 +7,7 @@ import (
 
 func TestSanitizeName(t *testing.T) {
 	result := sanitation.SanitizeName(`this will only accept printable text,
- that means, not control characters`)
+ that means, not control characters` + string(28))
 	expected := "this will only accept printable text, that means, not control characters"
 	if result != expected {
 		t.Errorf("Invalid sanitation.\n" +
