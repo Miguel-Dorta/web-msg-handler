@@ -1,41 +1,40 @@
 package config
+
 // Package config is the package that manages the functions related to the config file of web-msg-handler.
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sender"
 	"io/ioutil"
 )
 
-// config represents the main structure of the config file of web-msg-handler.
-// It consists in an array of sites.
+// config represents the structure of the config file of web-msg-handler.
+// It consists in an array of sites, which contains an numeric ID, an URL a ReCaptcha Secret and a Sender.
+// The sender is an object that contains a key "type" that indicates which kind of sender it is, and a dynamic "settings" object.
+//
+// The "settings" object will have the following keys depending of the sender type value.
+//
+// Mail type
+// 		"mailto":   string
+// 		"username": string
+// 		"password": string
+// 		"hostname": string
+// 		"port":     string
+//
+// Telegram type
+// 		"chatID":   string
+// 		"botToken": string
 type config struct {
-	Sites []site `json:"sites"`
-}
-
-// site represents the configuration of each site that web-msg-handler will be listen.
-type site struct {
-	ID              uint64      `json:"id"`
-	URL             string      `json:"url"`
-	RecaptchaSecret string      `json:"recaptcha-secret"`
-	Sender          interface{} `json:"sender"`
-}
-
-// mail represents the variable type "sender" of site when it represents an email sender.
-type mail struct {
-	Mailto   string `json:"mailto"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Hostname string `json:"hostname"`
-	Port     string `json:"port"`
-}
-
-// telegram represents the variable type "sender" of site when it represents a telegram sender.
-type telegram struct {
-	ChatID   string `json:"chat-id"`
-	BotToken string `json:"bot-token"`
+	Sites []struct {
+		ID              uint64 `json:"id"`
+		URL             string `json:"url"`
+		RecaptchaSecret string `json:"recaptchaSecret"`
+		Sender          struct {
+			Type     string            `json:"type"`
+			Settings map[string]string `json:"settings"`
+		} `json:"sender"`
+	} `json:"sites"`
 }
 
 // LoadConfig will read the config from the path provided and return a map of sender.Sender with uint64 key.
@@ -54,25 +53,26 @@ func LoadConfig(path string) (map[uint64]sender.Sender, error) {
 
 	for _, s := range c.Sites {
 		var parsedSender sender.Sender
-		if mailSender, ok := s.Sender.(*mail); ok {
+		switch s.Sender.Type {
+		case "mail":
 			parsedSender = &sender.Mail{
-				URL:             s.URL,
+				URL: s.URL,
 				RecaptchaSecret: s.RecaptchaSecret,
-				Mailto:          mailSender.Mailto,
-				Username:        mailSender.Username,
-				Password:        mailSender.Password,
-				Hostname:        mailSender.Hostname,
-				Port:            mailSender.Port,
+				Mailto: s.Sender.Settings["mailto"],
+				Username: s.Sender.Settings["username"],
+				Password: s.Sender.Settings["password"],
+				Hostname: s.Sender.Settings["hostname"],
+				Port: s.Sender.Settings["Port"],
 			}
-		} else if telegramSender, ok := s.Sender.(*telegram); ok {
+		case "telegram":
 			parsedSender = &sender.Telegram{
-				URL:             s.URL,
+				URL: s.URL,
 				RecaptchaSecret: s.RecaptchaSecret,
-				ChatId:          telegramSender.ChatID,
-				BotToken:        telegramSender.BotToken,
+				ChatId: s.Sender.Settings["chatID"],
+				BotToken: s.Sender.Settings["botToken"],
 			}
-		} else {
-			return nil, errors.New("error parsing config file: invalid sender")
+		default:
+			return nil, fmt.Errorf("error parsing config file in site with ID %d: invalid sender type \"%s\"", s.ID, s.Sender.Type)
 		}
 
 		if _, exists := senders[s.ID]; exists {
