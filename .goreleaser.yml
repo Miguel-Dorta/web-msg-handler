@@ -17,3 +17,9 @@ builds:
       - 7
 archive:
   format: tar.gz
+  files:
+    - LICENSE
+    - README.md
+    - configs/systemd/web-msg-handler.service
+    - examples/config.json
+    - install.sh
