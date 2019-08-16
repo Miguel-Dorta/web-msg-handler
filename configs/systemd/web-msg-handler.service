@@ -1,0 +1,20 @@
+[Unit]
+Description=A service for handling messages from multiple website contact pages
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+Restart=on-failure
+TimeoutStopSec=10
+
+# Execution settings
+ExecStart=/var/www/web-msg-handler/web-msg-handler --config="config.json" --verbose 2
+WorkingDirectory=/var/www/web-msg-handler
+User=www-data
+Group=www-data
+
+# Log
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=web-msg-handler
