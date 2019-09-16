@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var c = http.Client{Timeout: 10 * time.Second}
+var c = &http.Client{Timeout: 10 * time.Second}
 
 func PostJSON(url string, data []byte) ([]byte, error) {
 	resp, err := c.Post(url, pkg.MimeJSON, bytes.NewReader(data))
