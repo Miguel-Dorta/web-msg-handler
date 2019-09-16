@@ -1,24 +1,14 @@
 package config_test
 
 import (
-	"fmt"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/config"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sender"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strconv"
 	"testing"
-	"time"
 )
 
-func TestLoadConfig(t *testing.T) {
-	configPath, err := downloadConfig()
-	if err != nil {
-		t.Skipf("TestLoadConfig requires an Internet connection and a writable \"/tmp\" directory with a few KiB of free space. Skipping details: %s", err)
-	}
-	defer os.Remove(configPath)
+const configPath = "../../examples/config.json"
 
+func TestLoadConfig(t *testing.T) {
 	senders, err := config.LoadConfig(configPath)
 	if err != nil {
 		t.Fatalf("execution error of LoadConfig: %s", err)
@@ -137,31 +127,4 @@ func TestLoadConfig(t *testing.T) {
 			}
 		}
 	}
-}
-
-// downloadConfig is a helper of TestLoadConfig.
-// It will download the example config from the official repo and save it in "/tmp/web-msg-handler_config_<timestamp>.json".
-// It will return the filepath of the config or an error if the operation failed.
-func downloadConfig() (string, error) {
-	resp, err := http.Get("https://raw.githubusercontent.com/Miguel-Dorta/web-msg-handler/master/examples/config.json")
-	if err != nil {
-		return "", fmt.Errorf("failed to get config: %s", err)
-	}
-	defer resp.Body.Close()
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", fmt.Errorf("failed to read the request body: %s", err)
-	}
-
-	if err = resp.Body.Close(); err != nil {
-		return "", fmt.Errorf("error closing body request: %s", err)
-	}
-
-	filename := "/tmp/web-msg-handler_config_" + strconv.FormatInt(time.Now().UnixNano(), 10) + ".json"
-	if err = ioutil.WriteFile(filename, data, 0777); err != nil {
-		return "", fmt.Errorf("error writing file in \"%s\": %s", filename, err)
-	}
-
-	return filename, nil
 }
