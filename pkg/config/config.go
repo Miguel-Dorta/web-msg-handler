@@ -62,7 +62,7 @@ func LoadConfig(path string) (map[uint64]sender.Sender, error) {
 				Username: s.Sender.Settings["username"],
 				Password: s.Sender.Settings["password"],
 				Hostname: s.Sender.Settings["hostname"],
-				Port: s.Sender.Settings["Port"],
+				Port: s.Sender.Settings["port"],
 			}
 		case "telegram":
 			parsedSender = &sender.Telegram{
