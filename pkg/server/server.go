@@ -17,14 +17,17 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"sync"
 	"time"
 )
 
 const statusUnknownError = 502
 
 var (
-	Log *logolang.Logger
-	sites map[uint64]sender.Sender
+	Log        *logolang.Logger
+	closing    bool
+	requestsWG *sync.WaitGroup
+	sites      map[uint64]sender.Sender
 )
 
 // Run will start a HTTP server in the port provided using the config file path provided.
@@ -47,6 +50,10 @@ func Run(configFile, port string) {
 		<-quit // Block until quit signal is received
 
 		Log.Info("Shutting down")
+
+		closing = true
+		requestsWG.Wait()
+
 		if err := srv.Shutdown(context.Background()); err != nil {
 			Log.Criticalf("error while shutting down: %s", err)
 			os.Exit(1)
@@ -84,6 +91,15 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	// Request ID for logging purposes
 	requestID := time.Now().UnixNano()
 	Log.Debugf("[Request %d] Received: %+v", requestID, r)
+
+	// Close request if the closing var is set to true
+	if closing {
+		Log.Debugf("[Request %d] Reject request. Closing server.", requestID)
+		statusWriter(w, http.StatusServiceUnavailable, false, "closing server")
+		return
+	}
+	requestsWG.Add(1) // This is after the closing check because if it's before it could never stop
+	defer requestsWG.Done()
 
 	url := r.URL
 	id, err := strconv.ParseUint(url.Path[1:], 10, 64)
