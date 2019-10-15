@@ -16,5 +16,6 @@ chown -R www-data:www-data /var/www/web-msg-handler
 cp configs/systemd/web-msg-handler.service /lib/systemd/system
 chown root:root /lib/systemd/system/web-msg-handler.service
 chmod 0644 /lib/systemd/system/web-msg-handler.service
+systemctl enable web-msg-handler.service
 
 exit 0
