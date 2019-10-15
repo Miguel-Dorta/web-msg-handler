@@ -22,7 +22,7 @@ You can either download a [built release](https://github.com/Miguel-Dorta/web-ms
 ### Automatic installation
 IMPORTANT: the automatic installation will assume you use systemd and will create a working directory in "/var/www/web-msg-handler".
 * Extract the .tar.gz
-* In the directory where you extracted it, run scripts/install.sh
+* Run install.sh
 * Create a config.json file. You can see an example in "/var/www/web-msg-handler/config.json.example", or see the specification below.
 
 #### Run parameters

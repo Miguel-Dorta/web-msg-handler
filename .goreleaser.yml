@@ -1,7 +1,8 @@
 env:
   - GO111MODULE=on
 builds:
-  - main: cmd/web-msg-handler/main.go
+  - id: web-msg-handler
+    main: cmd/web-msg-handler/main.go
     binary: web-msg-handler
     ldflags: -X github.com/Miguel-Dorta/web-msg-handler/internal.Version={{.Version}}
     goos:
