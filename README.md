@@ -26,12 +26,14 @@ IMPORTANT: the automatic installation will assume you use systemd and will creat
 * Create a config.json file. You can see an example in "/var/www/web-msg-handler/config.json.example", or see the specification below.
 
 #### Run parameters
-* --config <path>      sets the config.json path         Default: config.json
-* -h, --help           shows a help message and exits
-* --log-file <path>    sets a log file path
-* --port <port>        sets the port                     Default: 8080
-* --verbose <level>    sets verbose level (see below)    Default: 2
-* --version            prints version and exits
+```
+--config <path>      sets the config.json path         Default: config.json
+-h, --help           shows a help message and exits
+--log-file <path>    sets a log file path
+--port <port>        sets the port                     Default: 8080
+--verbose <level>    sets verbose level (see below)    Default: 2
+--version            prints version and exits
+```
 
 ##### Verbose levels
 * 0 = no log
