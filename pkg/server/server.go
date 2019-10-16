@@ -11,7 +11,6 @@ import (
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/config"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sanitation"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sender"
-	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -46,7 +45,7 @@ func Run(configFile, port string) {
 
 	go func() {
 		quit := make(chan os.Signal, 2)
-		signal.Notify(quit, unix.SIGTERM, unix.SIGINT)
+		signal.Notify(quit, quitSignals...)
 		<-quit // Block until quit signal is received
 
 		Log.Info("Shutting down")
