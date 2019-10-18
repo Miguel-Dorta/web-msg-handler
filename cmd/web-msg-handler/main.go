@@ -22,7 +22,7 @@ func init() {
 	flag.StringVar(&configPath, "config", "config.json", "set config path")
 	flag.StringVar(&logFile, "log-file", "", "set log file")
 	flag.IntVar(&port, "port", 8080, "set port")
-	flag.IntVar(&verboseLevel, "verbose", 2, "set verbose level. 0=no-log, 1=critical, 2=errors, 3=info, 4 debug")
+	flag.IntVar(&verboseLevel, "verbose", 2, "set verbose level. 0=no-log, 1=critical, 2=errors, 3=info, 4=debug")
 	flag.BoolVar(&version, "version", false, "print version and exit")
 
 	flag.Parse()

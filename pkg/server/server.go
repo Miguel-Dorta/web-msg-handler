@@ -1,4 +1,5 @@
 package server
+
 // Package server will manage all the HTTP request made to web-msg-handler.
 
 import (
@@ -24,9 +25,10 @@ const statusUnknownError = 502
 
 var (
 	Log        *logolang.Logger
-	closing    bool
-	requestsWG *sync.WaitGroup
 	sites      map[uint64]sender.Sender
+
+	closing    = false
+	requestsWG = &sync.WaitGroup{}
 )
 
 // Run will start a HTTP server in the port provided using the config file path provided.
