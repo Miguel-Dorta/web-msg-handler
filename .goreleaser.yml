@@ -31,8 +31,8 @@ archives:
     builds:
       - generic
     format: zip
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}"
     replacements:
-      amd64: x86-64
       darwin: macOS
     files:
       - examples/config.json
