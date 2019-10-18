@@ -42,7 +42,7 @@ IMPORTANT: the automatic installation will assume you use systemd and will creat
 -h, --help           shows a help message and exits
 --log-file <path>    sets a log file path
 --port <port>        sets the port                     Default: 8080
---verbose <level>    sets verbose level (see below)    Default: 2
+--verbose <level>    sets verbose level (see below)    Default: 3
 --version            prints version and exits
 ```
 
