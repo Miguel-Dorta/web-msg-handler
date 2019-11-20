@@ -18,4 +18,15 @@ chown root:root /lib/systemd/system/web-msg-handler.service
 chmod 0644 /lib/systemd/system/web-msg-handler.service
 systemctl enable web-msg-handler.service
 
+# Copy nginx config
+cp config/nginx/web-msg-handler.conf /etc/nginx/sites
+chown root:root /etc/nginx/sites/web-msg-handler.conf
+chmod 0644 /etc/nginx/sites/web-msg-handler.conf
+
+# Notify
+echo "- Please review the configurations -"
+echo "CONFIG:  /var/www/web-msg-handler/config.json.example"
+echo "SYSTEMD: /lib/systemd/system/web-msg-handler.conf"
+echo "NGINX:   /etc/nginx/sites/web-msg-handler.conf"
+
 exit 0

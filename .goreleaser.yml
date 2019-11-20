@@ -45,6 +45,7 @@ archives:
     format: tar.gz
     files:
       - configs/systemd/web-msg-handler.service
+      - configs/nginx/web-msg-handler.conf
       - examples/config.json
       - install.sh
       - LICENSE

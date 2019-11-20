@@ -98,8 +98,7 @@ The response is a JSON that contains the following fields:
 * "error" (only when success==false): a string that indicates why it failed.
 
 ## To do
-* Add an example of a NGINX reverse proxy configuration.
-* Implement a modular system of plugins for more types of senders.
+* \[Postponed indefinitely - until plugins in Go work correctly\] Implement a modular system of plugins for more types of senders.
 
 ## License
 This software is licensed under MIT License. See [LICENSE](https://github.com/Miguel-Dorta/web-msg-handler/blob/master/LICENSE) for more information.
