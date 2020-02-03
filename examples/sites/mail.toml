@@ -1,0 +1,11 @@
+id="website2-mail"
+recaptcha_secret="xkmBhVrYaB0NhtHpHgAWeTnLZpTSxCKs0gigByk5"
+sender_type="mail"
+
+[sender]
+website_name="My personal website"
+mailto="where_i_want_to_receive_the_forms@website2.com"
+username="sender@website2.com"
+password="bNRxxIPxX7kLrbN8WCG22VUmpBqVBGgLTnyLdjob"
+hostname="smtp.website3.com"
+port="587"

@@ -1,0 +1,23 @@
+# Port to listen to
+port=8080
+
+# Verbosity level
+## 0 = no log
+## 1 = only critical errors
+## 2 = all errors
+## 3 = standard
+## 4 = debug
+verbose=3
+
+# Sites path
+sites="/etc/web-msg-handler/sites"
+
+# PID file
+pid_file="/run/web-msg-handler.pid"
+
+# Lock file
+lock_file="/run/lock/web-msg-handler.lock"
+
+# Log files
+log_output_file="/var/log/web-msg-handler/out.log"
+log_error_file="/var/log/web-msg-handler/err.log"
