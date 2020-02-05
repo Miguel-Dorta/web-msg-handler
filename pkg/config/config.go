@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/plugin"
 	"github.com/pelletier/go-toml"
 	"io/ioutil"
 	"path/filepath"
@@ -15,7 +16,7 @@ var (
 	Filename = "config.toml"
 )
 
-type config struct {
+type Config struct {
 	Port       int    `toml:"port"`
 	Verbose    int    `toml:"verbose"`
 	SitesPath  string `toml:"sites"`
@@ -32,13 +33,17 @@ type siteConfig struct {
 	SenderConfig    map[string]interface{} `toml:"sender"`
 }
 
-func LoadConfig() (*config, map[string]*siteConfig, error) {
+type Site struct {
+	RecaptchaSecret, SenderType, ConfigJS string
+}
+
+func LoadConfig() (*Config, map[string]*Site, error) {
 	data, err := ioutil.ReadFile(filepath.Join(Directory, Filename))
 	if err != nil {
 		return nil, nil, fmt.Errorf("error loading config: %w", err)
 	}
 
-	var c config
+	var c Config
 	if err := json.Unmarshal(data, &c); err != nil {
 		return nil, nil, fmt.Errorf("error parsing config: %w", err)
 	}
@@ -54,19 +59,19 @@ func LoadConfig() (*config, map[string]*siteConfig, error) {
 	return &c, sites, nil
 }
 
-func loadSites(path string) (map[string]*siteConfig, error) {
+func loadSites(path string) (map[string]*Site, error) {
 	sites, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("error listing sites directory: %w", err)
 	}
 
-	sitesMap := make(map[string]*siteConfig, len(sites))
-	for _, site := range sites {
-		if !site.Mode().IsRegular() {
+	sitesMap := make(map[string]*Site, len(sites))
+	for _, s := range sites {
+		if !s.Mode().IsRegular() {
 			continue
 		}
 
-		sitePath := filepath.Join(path, site.Name())
+		sitePath := filepath.Join(path, s.Name())
 		data, err := ioutil.ReadFile(sitePath)
 		if err != nil {
 			return nil, fmt.Errorf("error reading file \"%s\": %w", sitePath, err)
@@ -77,7 +82,16 @@ func loadSites(path string) (map[string]*siteConfig, error) {
 			return nil, fmt.Errorf("error parsing site config from file \"%s\": %w", sitePath, err)
 		}
 
-		sitesMap[sc.ID] = &sc
+		configJSON, err := plugin.ArgsToJS(sc.SenderConfig)
+		if err != nil {
+			return nil, fmt.Errorf("error generating config JSON for plugin %s: %w", s.Name(), err)
+		}
+
+		sitesMap[sc.ID] = &Site{
+			RecaptchaSecret: sc.RecaptchaSecret,
+			SenderType:      sc.SenderType,
+			ConfigJS:        configJSON,
+		}
 	}
 
 	return sitesMap, nil

@@ -36,7 +36,7 @@ var (
 // It can end the program execution prematurely.
 func Run(configFile, port string) {
 	var err error
-	sites, err = config.LoadConfig(configFile)
+	conf, sites, err = config.LoadConfig()
 	if err != nil {
 		Log.Criticalf("error loading config file: %s", err)
 		os.Exit(1)
