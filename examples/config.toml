@@ -7,7 +7,7 @@ port=8080
 ## 2 = all errors
 ## 3 = standard
 ## 4 = debug
-verbose=3
+verbose=4
 
 # Sites path
 sites="/etc/web-msg-handler/sites"

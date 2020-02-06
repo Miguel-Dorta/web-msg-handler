@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/client"
+	"strings"
 )
 
 const recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify"
@@ -26,6 +27,11 @@ type response struct {
 
 // CheckRecaptcha checks if the response provided have passed the ReCaptcha verification with the secret provided.
 func CheckRecaptcha(secret, userResponse string) error {
+	// When empty secret, omit verification
+	if secret == "" {
+		return nil
+	}
+
 	data, err := json.Marshal(request{
 		Secret:   secret,
 		Response: userResponse,
@@ -45,14 +51,17 @@ func CheckRecaptcha(secret, userResponse string) error {
 	}
 
 	if !resp.Success {
-		errStr := "recaptcha verification failed"
-		if len(resp.Errors) != 0 {
-			errStr += ":"
+		sb := new(strings.Builder)
+		sb.WriteString("recaptcha verification failed: ")
+		if len(resp.Errors) == 0 {
+			sb.WriteString("unknown reason")
+		} else {
+			sb.WriteString("reasons:")
 			for _, e := range resp.Errors {
-				errStr += " \"" + e + "\""
+				sb.WriteString(fmt.Sprintf("\n -> \"%s\"", e))
 			}
 		}
-		return errors.New(errStr)
+		return errors.New(sb.String())
 	}
 
 	return nil
