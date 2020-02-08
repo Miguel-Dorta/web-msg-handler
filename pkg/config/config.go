@@ -2,8 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/Miguel-Dorta/web-msg-handler/pkg/plugin"
 	"github.com/pelletier/go-toml"
 	"io/ioutil"
 	"path/filepath"
@@ -11,17 +11,22 @@ import (
 
 // TODO tests
 
+const (
+	SitesDirectory = "sites"
+	Filename = "config.toml"
+)
+
 var (
 	Directory = "/etc/web-msg-handler"
-	Filename = "config.toml"
+	sitesDirPath = filepath.Join(Directory, SitesDirectory)
+
+	ErrInvalidPort = errors.New("invalid port: must be between 0 and 65535")
 )
 
 type Config struct {
 	Port       int    `toml:"port"`
 	Verbose    int    `toml:"verbose"`
-	SitesPath  string `toml:"sites"`
 	PIDFile    string `toml:"pid_file"`
-	LockFile   string `toml:"lock_file"`
 	LogOutFile string `toml:"log_output_file"`
 	LogErrFile string `toml:"log_error_file"`
 }
@@ -34,7 +39,7 @@ type siteConfig struct {
 }
 
 type Site struct {
-	RecaptchaSecret, SenderType, ConfigJS string
+	RecaptchaSecret, SenderName, ConfigJS string
 }
 
 func LoadConfig() (*Config, map[string]*Site, error) {
@@ -48,19 +53,20 @@ func LoadConfig() (*Config, map[string]*Site, error) {
 		return nil, nil, fmt.Errorf("error parsing config: %w", err)
 	}
 
-	sitesPath := c.SitesPath
-	if !filepath.IsAbs(sitesPath) {
-		sitesPath = filepath.Join(Directory, sitesPath)
+	if c.Port < 0 || c.Port > 65535 {
+		return nil, nil, ErrInvalidPort
 	}
-	sites, err := loadSites(sitesPath)
+
+	sites, err := loadSites()
 	if err != nil {
 		return nil, nil, err
 	}
+
 	return &c, sites, nil
 }
 
-func loadSites(path string) (map[string]*Site, error) {
-	sites, err := ioutil.ReadDir(path)
+func loadSites() (map[string]*Site, error) {
+	sites, err := ioutil.ReadDir(sitesDirPath)
 	if err != nil {
 		return nil, fmt.Errorf("error listing sites directory: %w", err)
 	}
@@ -71,7 +77,7 @@ func loadSites(path string) (map[string]*Site, error) {
 			continue
 		}
 
-		sitePath := filepath.Join(path, s.Name())
+		sitePath := filepath.Join(sitesDirPath, s.Name())
 		data, err := ioutil.ReadFile(sitePath)
 		if err != nil {
 			return nil, fmt.Errorf("error reading file \"%s\": %w", sitePath, err)
@@ -82,15 +88,15 @@ func loadSites(path string) (map[string]*Site, error) {
 			return nil, fmt.Errorf("error parsing site config from file \"%s\": %w", sitePath, err)
 		}
 
-		configJSON, err := plugin.ArgsToJS(sc.SenderConfig)
+		configJSON, err := json.Marshal(sc.SenderConfig)
 		if err != nil {
 			return nil, fmt.Errorf("error generating config JSON for plugin %s: %w", s.Name(), err)
 		}
 
 		sitesMap[sc.ID] = &Site{
 			RecaptchaSecret: sc.RecaptchaSecret,
-			SenderType:      sc.SenderType,
-			ConfigJS:        configJSON,
+			SenderName:      sc.SenderType,
+			ConfigJS:        string(configJSON),
 		}
 	}
 

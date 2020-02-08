@@ -9,14 +9,8 @@ port=8080
 ## 4 = debug
 verbose=4
 
-# Sites path
-sites="/etc/web-msg-handler/sites"
-
 # PID file
 pid_file="/run/web-msg-handler.pid"
-
-# Lock file
-lock_file="/run/lock/web-msg-handler.lock"
 
 # Log files
 log_output_file="/var/log/web-msg-handler/out.log"
