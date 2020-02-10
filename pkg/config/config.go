@@ -18,8 +18,6 @@ const (
 
 var (
 	Directory = "/etc/web-msg-handler"
-	sitesDirPath = filepath.Join(Directory, SitesDirectory)
-
 	ErrInvalidPort = errors.New("invalid port: must be between 0 and 65535")
 )
 
@@ -42,31 +40,28 @@ type Site struct {
 	RecaptchaSecret, SenderName, ConfigJS string
 }
 
-func LoadConfig() (*Config, map[string]*Site, error) {
+func Load() (*Config, error) {
 	data, err := ioutil.ReadFile(filepath.Join(Directory, Filename))
 	if err != nil {
-		return nil, nil, fmt.Errorf("error loading config: %w", err)
+		return nil, fmt.Errorf("error loading config: %w", err)
 	}
 
 	var c Config
 	if err := json.Unmarshal(data, &c); err != nil {
-		return nil, nil, fmt.Errorf("error parsing config: %w", err)
+		return nil, fmt.Errorf("error parsing config: %w", err)
 	}
 
 	if c.Port < 0 || c.Port > 65535 {
-		return nil, nil, ErrInvalidPort
+		return nil, ErrInvalidPort
 	}
 
-	sites, err := loadSites()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return &c, sites, nil
+	return &c, nil
 }
 
-func loadSites() (map[string]*Site, error) {
-	sites, err := ioutil.ReadDir(sitesDirPath)
+func LoadSites() (map[string]*Site, error) {
+	path := filepath.Join(Directory, SitesDirectory)
+
+	sites, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, fmt.Errorf("error listing sites directory: %w", err)
 	}
@@ -77,7 +72,7 @@ func loadSites() (map[string]*Site, error) {
 			continue
 		}
 
-		sitePath := filepath.Join(sitesDirPath, s.Name())
+		sitePath := filepath.Join(path, s.Name())
 		data, err := ioutil.ReadFile(sitePath)
 		if err != nil {
 			return nil, fmt.Errorf("error reading file \"%s\": %w", sitePath, err)
