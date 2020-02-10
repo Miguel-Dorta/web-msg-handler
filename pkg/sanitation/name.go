@@ -8,9 +8,6 @@ import (
 // SanitizeName will remove illegal characters from the "name" field of api.Request
 func SanitizeName(name string) string {
 	return strings.Map(func(r rune) rune {
-		if r == '\\' {
-			return -1
-		}
 		if unicode.IsPrint(r) {
 			return r
 		}

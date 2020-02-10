@@ -56,7 +56,7 @@ func root(_ *cobra.Command, _ []string) {
 		os.Exit(1)
 	}
 
-	server.Run(c.Port)
+	server.Run(c.Port, log)
 }
 
 func reload(_ *cobra.Command, _ []string) {

@@ -8,9 +8,6 @@ import (
 // SanitizeMsg will remove illegal characters from the "msg" field of api.Request
 func SanitizeMsg(msg string) string {
 	return strings.Map(func(r rune) rune {
-		if r == '\\' {
-			return -1
-		}
 		if unicode.IsPrint(r) || r == '\n' {
 			return r
 		}
