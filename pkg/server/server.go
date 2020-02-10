@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"github.com/Miguel-Dorta/logolang"
 	"github.com/Miguel-Dorta/web-msg-handler/api"
-	"github.com/Miguel-Dorta/web-msg-handler/pkg"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/config"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/mime"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/plugin"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/recaptcha"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sanitation"
@@ -120,7 +120,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if contentType := r.Header.Get(pkg.MimeContentType); contentType != pkg.MimeJSON {
+	if contentType := r.Header.Get(mime.ContentType); contentType != mime.JSON {
 		log.Debugf("[Request %d] Invalid content type: %s", requestID, contentType)
 		statusWriter(w, ErrContentTypeNotAllowed)
 		return
@@ -173,7 +173,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 // That response will be sent with the status code provided,
 // and its body will consists in a JSON represented by api.Response with the success status and error provided.
 func statusWriter(w http.ResponseWriter, resp *httpResponse) {
-	w.Header().Set(pkg.MimeContentType, pkg.MimeJSON)
+	w.Header().Set(mime.ContentType, mime.JSON)
 	w.WriteHeader(resp.status)
 
 	data, _ := json.Marshal(api.Response{

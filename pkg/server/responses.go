@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/Miguel-Dorta/web-msg-handler/pkg"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/mime"
 	"net/http"
 )
 
@@ -27,7 +27,7 @@ var (
 	ErrContentTypeNotAllowed = &httpResponse{
 		success: false,
 		status:  http.StatusBadRequest,
-		msg:     pkg.MimeContentType + " not allowed",
+		msg:     mime.ContentType + " not allowed",
 	}
 	ErrMalformedJSON = &httpResponse{
 		success: false,

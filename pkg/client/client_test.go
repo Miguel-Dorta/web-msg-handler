@@ -3,8 +3,8 @@ package client_test
 import (
 	"context"
 	"fmt"
-	"github.com/Miguel-Dorta/web-msg-handler/pkg"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/client"
+	"github.com/Miguel-Dorta/web-msg-handler/pkg/mime"
 	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"net/http"
@@ -20,7 +20,7 @@ func TestPostJSON(t *testing.T) {
 			errs = append(errs, "Method is not POST")
 		}
 
-		if contentType := r.Header.Get(pkg.MimeContentType); contentType != pkg.MimeJSON {
+		if contentType := r.Header.Get(mime.ContentType); contentType != mime.JSON {
 			errs = append(errs, "Content-Type is not JSON")
 		}
 
@@ -33,7 +33,7 @@ func TestPostJSON(t *testing.T) {
 			errs = append(errs, fmt.Sprintf("Unexpected body:\n-> Expected: {\"test\": \"hi\"}\n-> Found: %s", string(body)))
 		}
 
-		w.Header().Set(pkg.MimeContentType, pkg.MimeJSON)
+		w.Header().Set(mime.ContentType, mime.JSON)
 		statusCode := 200
 		resp := "{\"success\": true}"
 		if len(errs) != 0 {
