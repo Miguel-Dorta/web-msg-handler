@@ -49,6 +49,11 @@ var (
 		status:  statusUnknownError,
 		msg:     "unknown error reading request body",
 	}
+	ErrUnknown = &httpResponse{
+		success: false,
+		status:  statusUnknownError,
+		msg:     "unknown error",
+	}
 	ErrInternalServerError = &httpResponse{
 		success: false,
 		status:  http.StatusInternalServerError,

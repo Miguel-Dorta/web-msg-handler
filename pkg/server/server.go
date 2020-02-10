@@ -12,6 +12,7 @@ import (
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/plugin"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/recaptcha"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sanitation"
+	"golang.org/x/sys/unix"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -33,33 +34,41 @@ func init() {
 // Run will start a HTTP server in the port provided using the config file path provided.
 // It ends when a termination or interrupt signal is received.
 // It can end the program execution prematurely.
-func Run() {
-	var (
-		conf *config.Config
-		err error
-	)
-	conf, sites, err = config.LoadConfig()
+func Run(port int) {
+	err := loadSites()
 	if err != nil {
-		log.Criticalf("error loading config: %s", err)
+		log.Criticalf("error loading sites config: %s", err)
 		os.Exit(1)
 	}
 
 	http.HandleFunc("/", handle)
-	srv := http.Server{Addr: ":" + strconv.Itoa(conf.Port)}
+	srv := http.Server{Addr: ":" + strconv.Itoa(port)}
 
 	serverClosed := make(chan bool)
 	go func() {
+		var (
+			quit = make(chan os.Signal, 2)
+			reload = make(chan os.Signal, 1)
+		)
+		signal.Notify(quit, unix.SIGTERM, unix.SIGINT)
+		signal.Notify(reload, unix.SIGUSR1)
 		defer close(serverClosed)
 
-		quit := make(chan os.Signal, 2)
-		signal.Notify(quit, quitSignals...)
-		<-quit // Block until quit signal is received
-
-		log.Info("Shutting down")
-
-		if err := srv.Shutdown(context.Background()); err != nil {
-			log.Criticalf("error while shutting down: %s", err)
-			os.Exit(1)
+		for {
+			select {
+			case <-reload:
+				if err := loadSites(); err != nil {
+					log.Errorf("error reloading sites config: %s", err)
+					log.Info("preserving previous config")
+				}
+			case <-quit:
+				log.Info("Shutting down")
+				if err := srv.Shutdown(context.Background()); err != nil {
+					log.Criticalf("error while shutting down: %s", err)
+					os.Exit(1)
+				}
+				return
+			}
 		}
 	}()
 
@@ -137,10 +146,10 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	msgJS, err := plugin.MsgToJS(sanitation.SanitizeName(r2.Name), r2.Mail, sanitation.SanitizeMsg(r2.Msg))
+	msgJS, err := msgToJSON(sanitation.SanitizeName(r2.Name), r2.Mail, sanitation.SanitizeMsg(r2.Msg))
 	if err != nil {
-		log.Errorf("[Request %d] Error parsing msg to JS: %s", requestID, err)
-		statusWriter(w, ErrInternalServerError)
+		log.Errorf("[Request %d] Error parsing msg to JSON: %s", requestID, err)
+		statusWriter(w, ErrUnknown)
 		return
 	}
 
@@ -150,7 +159,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = plugin.Exec(site.SenderType, site.ConfigJS, msgJS); err != nil {
+	if err = plugin.Exec(site.SenderName, site.ConfigJS, msgJS); err != nil {
 		log.Errorf("[Request %d] Sender failed: %s", requestID, err)
 		statusWriter(w, ErrInternalServerError)
 		return
@@ -175,4 +184,27 @@ func statusWriter(w http.ResponseWriter, resp *httpResponse) {
 	if _, err := w.Write(data); err != nil {
 		log.Errorf("error writing response: %s", err)
 	}
+}
+
+// loadSites loads the site configs and sets it to the package variable "sites"
+func loadSites() error {
+	s, err := config.LoadSites()
+	if err != nil {
+		return err
+	}
+	sites = s
+	return nil
+}
+
+// msgToJSON takes the name, mail and msg provided and creates the JSON that will be passed to the site
+func msgToJSON(name, mail, msg string) (string, error) {
+	data, err := json.Marshal(map[string]string{
+		"name": name,
+		"mail": mail,
+		"msg": msg,
+	})
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
 }
