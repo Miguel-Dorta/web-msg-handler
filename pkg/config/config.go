@@ -10,13 +10,18 @@ import (
 
 // TODO tests
 
+// Filename is the default filename of the web-msg-handler config
 const Filename = "config.toml"
 
 var (
-	Directory = "/etc/web-msg-handler"
+	// Directory is the default setting directory path
+	Directory = "/etc/opt/web-msg-handler"
+
+	// ErrInvalidPort is returned when the config have a invalid port
 	ErrInvalidPort = errors.New("invalid port: must be between 0 and 65535")
 )
 
+// Config represents the structure of the web-msg-handler config
 type Config struct {
 	Port       int    `toml:"port"`
 	Verbose    int    `toml:"verbose"`
@@ -25,6 +30,7 @@ type Config struct {
 	LogErrFile string `toml:"log_error_file"`
 }
 
+// Load will read the config from Directory and return a Config object
 func Load() (*Config, error) {
 	data, err := ioutil.ReadFile(filepath.Join(Directory, Filename))
 	if err != nil {

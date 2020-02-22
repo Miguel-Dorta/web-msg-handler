@@ -1,5 +1,4 @@
 package server
-
 // Package server will manage all the HTTP request made to web-msg-handler.
 
 import (
@@ -18,8 +17,8 @@ var (
 	sites map[string]*config.Site
 )
 
-// Run will start a HTTP server in the port provided using the config file path provided.
-// It ends when a termination or interrupt signal is received.
+// Run will start a HTTP server in the port provided using the logger provided.
+// It ends when a SIGTERM or SIGINT is received.
 // It can end the program execution prematurely.
 func Run(port int, logger *logolang.Logger) {
 	log = logger

@@ -1,4 +1,5 @@
 package plugin
+// Package plugin is the package that will execute the web-msg-handler plugins. It depends of having Node.js installed.
 
 import (
 	"bytes"
@@ -11,10 +12,16 @@ import (
 )
 
 const (
+	// Directory is the subdirectory of config.Directory where plugins will be saved
 	Directory = "plugins"
+
+	// ext is the extension of the plugins
 	ext       = ".js"
 )
 
+// Exec will execute the plugin with the name provided. It requires args and msg being JSON,
+// the first should contain the plugin config (and therefore is up to the plugin creator to define it and check it) and
+// the second will contain 3 fields: "name", "mail" and "msg", all of them strings.
 func Exec(pluginName, args, msg string) error {
 	pluginName += ext
 	ctx, _ := context.WithTimeout(context.Background(), time.Second*5)

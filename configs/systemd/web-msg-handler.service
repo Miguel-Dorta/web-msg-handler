@@ -9,7 +9,7 @@ Restart=on-failure
 TimeoutStopSec=10
 
 # Execution settings
-ExecStart=/var/www/web-msg-handler/web-msg-handler --config="config.json" --verbose 2
+ExecStart=/opt/web-msg-handler
 WorkingDirectory=/var/www/web-msg-handler
 User=www-data
 Group=www-data

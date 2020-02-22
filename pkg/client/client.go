@@ -10,8 +10,11 @@ import (
 	"time"
 )
 
+// c is the common HTTP client for this package
 var c = &http.Client{Timeout: 10 * time.Second}
 
+// PostJSON makes a POST request to the URL provided with the JSON data provided.
+// It returns the data of the body of the response.
 func PostJSON(url string, data []byte) ([]byte, error) {
 	resp, err := c.Post(url, mime.JSON, bytes.NewReader(data))
 	if err != nil {

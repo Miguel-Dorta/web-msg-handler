@@ -39,6 +39,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 	siteID := r.URL.Path[1:]
 
+	// Check if site exists
 	site, ok := sites[siteID]
 	if !ok {
 		log.Debugf("[Request %d] Site ID not found: %d", requestID, siteID)
@@ -46,18 +47,21 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if method is valid
 	if method := r.Method; method != http.MethodPost {
 		log.Debugf("[Request %d] Invalid method: %s", requestID, method)
 		statusWriter(w, ErrMethodNotAllowed)
 		return
 	}
 
+	// Check if content-type is valid
 	if contentType := r.Header.Get(mime.ContentType); contentType != mime.JSON {
 		log.Debugf("[Request %d] Invalid content type: %s", requestID, contentType)
 		statusWriter(w, ErrContentTypeNotAllowed)
 		return
 	}
 
+	// Read body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Errorf("[Request %d] Error while reading body: %s", requestID, err)
@@ -65,6 +69,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Parse body
 	var r2 api.Request
 	if err = json.Unmarshal(body, &r2); err != nil {
 		log.Debugf("[Request %d] Malformed JSON: %s", requestID, err)
@@ -72,12 +77,14 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check valid email
 	if !sanitation.IsValidMail(r2.Mail) {
 		log.Debugf("[Request %d] Invalid email", requestID)
 		statusWriter(w, ErrInvalidMail)
 		return
 	}
 
+	// Sanitate and serialize input
 	msgJS, err := msgToJSON(sanitation.SanitizeName(r2.Name), r2.Mail, sanitation.SanitizeMsg(r2.Msg))
 	if err != nil {
 		log.Errorf("[Request %d] Error parsing msg to JSON: %s", requestID, err)
@@ -85,13 +92,15 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check recaptcha
 	if err = recaptcha.CheckRecaptcha(site.RecaptchaSecret, r2.Recaptcha); err != nil {
 		log.Debugf("[Request %d] Recaptcha verification failed: %s", requestID, err)
 		statusWriter(w, ErrRecaptchaVerificationFailed)
 		return
 	}
 
-	if err = plugin.Exec(site.SenderName, site.ConfigJS, msgJS); err != nil {
+	// Exec plugin
+	if err = plugin.Exec(site.SenderName, site.ConfigJSON, msgJS); err != nil {
 		log.Errorf("[Request %d] Sender failed: %s", requestID, err)
 		statusWriter(w, ErrInternalServerError)
 		return

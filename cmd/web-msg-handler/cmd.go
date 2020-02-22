@@ -16,6 +16,7 @@ import (
 )
 
 var (
+	// Cobra commands
 	cmdRoot = &cobra.Command{
 		Use: "web-msg-handler",
 		Run: root,
@@ -49,6 +50,8 @@ func init() {
 	cmdRoot.AddCommand(cmdReload, cmdRestart, cmdStop, cmdVersion)
 }
 
+// root will execute when no command is given.
+// It starts the service if no other instance is running.
 func root(_ *cobra.Command, _ []string) {
 	c := loadConf()
 	if err := si.Register(c.PIDFile); err != nil {
@@ -59,6 +62,8 @@ func root(_ *cobra.Command, _ []string) {
 	server.Run(c.Port, log)
 }
 
+// reload will execute when "reload" command is given.
+// It will send a SIGUSR1 signal to a running process in order to reload its sites configs.
 func reload(_ *cobra.Command, _ []string) {
 	c := loadConf()
 	p, err := si.Find(c.PIDFile)
@@ -80,11 +85,15 @@ func reload(_ *cobra.Command, _ []string) {
 	log.Debug("reload signal delivered. Check the log of web-msg-handler for detecting error")
 }
 
+// restart will execute when "restart" command is given.
+// It will stop other instance and start this one.
 func restart(_ *cobra.Command, _ []string) {
 	stop(nil, nil)
 	root(nil, nil)
 }
 
+// stop will execute when "stop" command is given.
+// It will stop another instance of web-msg-handler if it's running.
 func stop(_ *cobra.Command, _ []string) {
 	c := loadConf()
 	p, err := si.Find(c.PIDFile)
@@ -94,7 +103,7 @@ func stop(_ *cobra.Command, _ []string) {
 	}
 
 	if p == nil {
-		os.Exit(0)
+		return
 	}
 
 	if err := p.Signal(os.Interrupt); err != nil {
@@ -108,10 +117,15 @@ func stop(_ *cobra.Command, _ []string) {
 	}
 }
 
+// version will execute when "version" command is given.
+// It will print web-msg-handler's version and exit.
 func version(_ *cobra.Command, _ []string) {
 	fmt.Println(internal.Version)
 }
 
+// loadConf returns the config that exists in installationPath,
+// apply it to this package logger and
+// return the config with the PID alias in config.PIDFile
 func loadConf() *config.Config {
 	config.Directory = installationPath
 
@@ -131,6 +145,7 @@ func loadConf() *config.Config {
 	return c
 }
 
+// setWriter will return an io.Writer for the file of the specified path or the writer provided if path == ""
 func setWriter(path string, w io.Writer) io.Writer {
 	if path == "" {
 		return &logolang.SafeWriter{W:w}
@@ -144,6 +159,8 @@ func setWriter(path string, w io.Writer) io.Writer {
 	return &logolang.SafeWriter{W: f}
 }
 
+// getAlias gets a path for a pith file, sets si.Dir to that path's parent dir,
+// and return the alias for that file (filename without ".pid")
 func getAlias(pidFile string) string {
 	pidFile = strings.TrimRight(pidFile, ".pid")
 	si.Dir = filepath.Dir(pidFile)
