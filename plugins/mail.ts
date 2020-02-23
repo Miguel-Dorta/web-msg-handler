@@ -75,4 +75,4 @@ function send(sett: Settings, msg: Message) {
     });
 }
 
-send(new Settings(process.argv[2]), JSON.parse(process.argv[3])).catch((err) => process.stderr.write(err))
+send(new Settings(process.argv[2]), JSON.parse(process.argv[3])).catch((err) => process.stderr.write(err));
