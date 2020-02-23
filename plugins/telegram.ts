@@ -1,33 +1,33 @@
-const https = require("https")
+const https = require("https");
 
 // printError prints a string to stderr
 function printError(err: string) {
-    process.stderr.write(err)
+    process.stderr.write(err);
 }
 
 // Settings is the object that contains the site settings.
 class Settings {
-    webName: string
-    chatID: string
-    botToken: string
+    webName: string;
+    chatID: string;
+    botToken: string;
 
     constructor(json: string) {
         let sett = JSON.parse(json)
-        if (!sett.hasOwnProperty("webName") || !sett.hasOwnProperty("chatID") || !sett.hasOwnProperty("botToken")) {
-            throw new Error("invalid object")
+        if (!sett.hasOwnProperty("website_name") || !sett.hasOwnProperty("chat_id") || !sett.hasOwnProperty("bot_token")) {
+            throw new Error("invalid object");
         }
-        this.webName = sett.webName
-        this.chatID = sett.chatID
-        this.botToken = sett.botToken
+        this.webName = sett.website_name;
+        this.chatID = sett.chat_id;
+        this.botToken = sett.bot_token;
     }
 }
 
 // Message is the interface that contains the message itself.
 // The object provided will always implement this interface.
 interface Message {
-    name: string
-    mail: string
-    msg: string
+    name: string;
+    mail: string;
+    msg: string;
 }
 
 // escapeHTML escapes reserved characters in HTML
@@ -36,16 +36,16 @@ function escapeHTML(s: string) : string {
             .replace("'", "&#39;")
             .replace("<", "&lt;")
             .replace(">", "&gt;")
-            .replace("\"", "&#34;")
+            .replace("\"", "&#34;");
 }
 
 // composeMsg creates the string message that will be sent
 function composeMsg(sett: Settings, msg: Message) : string {
-    let webName = escapeHTML(sett.webName)
-    let name = escapeHTML(msg.name)
-    let mail = escapeHTML(msg.mail)
-    let escapedMsg = escapeHTML(msg.msg)
-    return `Message from ${webName}\n\n<b>Name:</b> ${name}\n<b>Email:</b> ${mail}\n<b>Message:</b> ${escapedMsg}`
+    let webName = escapeHTML(sett.webName);
+    let name = escapeHTML(msg.name);
+    let mail = escapeHTML(msg.mail);
+    let escapedMsg = escapeHTML(msg.msg);
+    return `Message from ${webName}\n\n<b>Name:</b> ${name}\n<b>Email:</b> ${mail}\n<b>Message:</b> ${escapedMsg}`;
 }
 
 // send is the main function of the script.
@@ -57,7 +57,7 @@ function send(sett: Settings, msg: Message) {
         "text": composeMsg(sett, msg),
         "parse_mode": "HTML",
         "disable_web_page_preview": true,
-    })
+    });
 
     // make POST request
     let req = https.request({
@@ -75,7 +75,7 @@ function send(sett: Settings, msg: Message) {
                 printError(`server returned error: ${respObj.error_message}`)
             }
         })
-    })
+    });
 
     req.on('error', function(e) {
         printError(`request failed: ${e.message}`)
@@ -85,4 +85,4 @@ function send(sett: Settings, msg: Message) {
     req.end()
 }
 
-send(new Settings(process.argv[2]), JSON.parse(process.argv[3]))
+send(new Settings(process.argv[2]), JSON.parse(process.argv[3]));

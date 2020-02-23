@@ -1,0 +1,10 @@
+{
+  "name": "web-msg-handler-plugins",
+  "version": "0.1.0",
+  "author": "Miguel-Dorta",
+  "license": "MIT",
+  "dependencies": {
+    "nodemailer": "^6.4.3",
+    "typescript": "^3.8.2"
+  }
+}
