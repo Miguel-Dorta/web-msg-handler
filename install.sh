@@ -1,32 +1,45 @@
 #!/bin/bash
 
+INSTALLATION_PATH="/opt/web-msg-handler"
+SETTINGS_PATH="/etc/opt/web-msg-handler"
+PLUGINS_PATH="$SETTINGS_PATH/plugins"
+SITES_PATH="$SETTINGS_PATH/sites"
+SYSTEMD_SERVICE_PATH="/lib/systemd/system/web-msg-handler.service"
+NGINX_SITE_PATH="/etc/nginx/sites/web-msg-handler.conf"
+
 # Check for root access
 if [ $(whoami) != "root" ]; then
 	echo "Error: permission denied"
 	exit 1
 fi
 
-# Copy program and config to /var/www/web-msg-handler
-mkdir -p /var/www/web-msg-handler
-cp web-msg-handler /var/www/web-msg-handler
-cp examples/config.json /var/www/web-msg-handler/config.json.example
-chown -R www-data:www-data /var/www/web-msg-handler
+# Change owner of all files to root
+chown -R root:root *
+
+# Copy program to installation path
+mkdir -p $INSTALLATION_PATH
+cp web-msg-handler $INSTALLATION_PATH
+
+# Copy configs and plugins
+mkdir -p $PLUGINS_PATH $SITES_PATH
+cp examples/config.toml $SETTINGS_PATH/config.toml.example
+cp examples/sites/mail.toml $SITES_PATH/mail.toml.example
+cp examples/sites/telegram.toml $SITES_PATH/telegram.toml.example
+cp plugins/* $PLUGINS_PATH
 
 # Copy systemd unit
-cp configs/systemd/web-msg-handler.service /lib/systemd/system
-chown root:root /lib/systemd/system/web-msg-handler.service
-chmod 0644 /lib/systemd/system/web-msg-handler.service
+cp configs/systemd/web-msg-handler.service $SYSTEMD_SERVICE_PATH
+chmod 0644 $SYSTEMD_SERVICE_PATH
 systemctl enable web-msg-handler.service
 
 # Copy nginx config
-cp config/nginx/web-msg-handler.conf /etc/nginx/sites
-chown root:root /etc/nginx/sites/web-msg-handler.conf
-chmod 0644 /etc/nginx/sites/web-msg-handler.conf
+cp config/nginx/web-msg-handler.conf $NGINX_SITE_PATH
+chmod 0644 $NGINX_SITE_PATH
 
 # Notify
 echo "- Please review the configurations -"
-echo "CONFIG:  /var/www/web-msg-handler/config.json.example"
-echo "SYSTEMD: /lib/systemd/system/web-msg-handler.conf"
-echo "NGINX:   /etc/nginx/sites/web-msg-handler.conf"
+echo "CONFIG:  $SETTINGS_PATH"
+echo "SYSTEMD: $SYSTEMD_SERVICE_PATH"
+echo "NGINX:   $NGINX_SITE_PATH"
 
 exit 0
