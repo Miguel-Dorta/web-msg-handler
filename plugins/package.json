@@ -4,7 +4,11 @@
   "author": "Miguel-Dorta",
   "license": "MIT",
   "dependencies": {
-    "nodemailer": "^6.4.3",
+    "nodemailer": "^6.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^13.7.4",
+    "@types/nodemailer": "^6.4.0",
     "typescript": "^3.8.2"
   }
 }
