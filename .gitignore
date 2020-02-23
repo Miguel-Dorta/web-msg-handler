@@ -1,6 +1,7 @@
 # Binaries for programs and plugins
 dist/
 plugins/node_modules
+plugins/*.js
 *.exe
 *.exe~
 *.dll

@@ -1,18 +1,12 @@
 env:
   - GO111MODULE=on
+before:
+  hooks:
+    - go mod tidy
+    - plugins/build.sh
 builds:
-  - id: generic
-    main: cmd/web-msg-handler/main.go
-    binary: web-msg-handler
-    ldflags: -X github.com/Miguel-Dorta/web-msg-handler/internal.Version={{.Version}}
-    goos:
-      - darwin
-      - windows
-    goarch:
-      - amd64
-
   - id: linux
-    main: cmd/web-msg-handler/main.go
+    main: ./cmd/web-msg-handler
     binary: web-msg-handler
     ldflags: -X github.com/Miguel-Dorta/web-msg-handler/internal.Version={{.Version}}
     goos:
@@ -26,27 +20,16 @@ builds:
       - 5
       - 6
       - 7
-archives:
-  - id: archiveGeneric
-    builds:
-      - generic
-    format: zip
-    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}"
-    replacements:
-      darwin: macOS
-    files:
-      - examples/config.json
-      - LICENSE
-      - README.md
 
+archives:
   - id: archiveLinux
     builds:
       - linux
     format: tar.gz
     files:
-      - configs/systemd/web-msg-handler.service
-      - configs/nginx/web-msg-handler.conf
-      - examples/config.json
+      - configs/**/*
+      - examples/**/*
+      - plugins/*.js
       - install.sh
       - LICENSE
       - README.md
