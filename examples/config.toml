@@ -12,6 +12,6 @@ verbose=4
 # PID file
 pid_file="/run/web-msg-handler.pid"
 
-# Log files
-log_output_file="/var/log/web-msg-handler/out.log"
-log_error_file="/var/log/web-msg-handler/err.log"
+# Log files. If not defined, stdout and stderr are used.
+#log_output_file="/var/log/web-msg-handler/out.log"
+#log_error_file="/var/log/web-msg-handler/err.log"

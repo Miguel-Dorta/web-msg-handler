@@ -4,8 +4,8 @@ sender_type="mail"
 
 [sender]
 website_name="My personal website"
-mailto="where_i_want_to_receive_the_forms@website2.com"
-username="sender@website2.com"
+mailto="where_i_want_to_receive_the_forms@mailprovider2.org"
+username="sender_address@mailprovider1.com"
 password="bNRxxIPxX7kLrbN8WCG22VUmpBqVBGgLTnyLdjob"
-hostname="smtp.website3.com"
-port="587"
+hostname="smtp.mailprovider1.com"
+port=587
