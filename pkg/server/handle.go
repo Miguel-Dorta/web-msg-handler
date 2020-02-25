@@ -1,7 +1,9 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"github.com/Miguel-Dorta/web-msg-handler/api"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/mime"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/plugin"
@@ -101,6 +103,12 @@ func handle(w http.ResponseWriter, r *http.Request) {
 
 	// Exec plugin
 	if err = plugin.Exec(site.SenderName, site.ConfigJSON, msgJS); err != nil {
+		if errors.Is(err, context.DeadlineExceeded) {
+			log.Errorf("[Request %d] Sender %s took too long", requestID, site.SenderName)
+			statusWriter(w, ErrGatewayTimeout)
+			return
+		}
+
 		log.Errorf("[Request %d] Sender failed: %s", requestID, err)
 		statusWriter(w, ErrInternalServerError)
 		return

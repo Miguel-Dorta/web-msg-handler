@@ -59,6 +59,11 @@ var (
 		status:  http.StatusInternalServerError,
 		msg:     "internal server error",
 	}
+	ErrGatewayTimeout = &httpResponse{
+		success: false,
+		status:  http.StatusGatewayTimeout,
+		msg:     "gateway timeout",
+	}
 	ResponseOK = &httpResponse{
 		success: true,
 		status:  http.StatusOK,
