@@ -29,7 +29,7 @@ You can either download a [built release](https://github.com/Miguel-Dorta/web-ms
 The API of web-msg-handler tries to be minimal. It consists only in a request and a response.
 
 ### Request
-The request must be made to the URL `/<ID>` where `<ID>` is the site ID of the config.json. This request must:
+The request must be made to the URL `/<ID>` where `<ID>` is the ID of the site defined in its config. This request must:
 * Have a valid ID
 * Be a POST request
 * Have a header with key "Content-Type" and value that contains "application/json"

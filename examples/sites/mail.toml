@@ -1,11 +1,17 @@
-id="website2-mail"
+# Site ID, must be unique. This sender will be listening the URL /website2
+id="website2"
+
+# Google's reCAPTCHA v2 secret
 recaptcha_secret="xkmBhVrYaB0NhtHpHgAWeTnLZpTSxCKs0gigByk5"
+
+# Sender to use, it must match the name of a plugin in the "plugins" folder
 sender_type="mail"
 
+# Sender specific settings (in this case, mail sender settings)
 [sender]
-website_name="My personal website"
-mailto="where_i_want_to_receive_the_forms@mailprovider2.org"
-username="sender_address@mailprovider1.com"
-password="bNRxxIPxX7kLrbN8WCG22VUmpBqVBGgLTnyLdjob"
-hostname="smtp.mailprovider1.com"
-port=587
+website_name="My personal website" # Website name for identifying it
+mailto="receiver_address@mailprovider2.org" # The address you want to receive the emails, can be the same as username
+username="sender_address@mailprovider1.com" # The address you want to send the emails, can be the same as mailto
+password="bNRxxIPxX7kLrbN8WCG22VUmpBqVBGgLTnyLdjob" # Sender mail's password
+hostname="smtp.mailprovider1.com" # Sender mail's SMTP hostname
+port=587 # Sender mail's SMTP port
