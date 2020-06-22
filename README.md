@@ -32,7 +32,7 @@ The API of web-msg-handler tries to be minimal. It consists only in a request an
 The request must be made to the URL `/<ID>` where `<ID>` is the site ID of the config.json. This request must:
 * Have a valid ID
 * Be a POST request
-* Have a header with key "Content-Type" and value "application/json"
+* Have a header with key "Content-Type" and value that contains "application/json"
 
 The request must be a JSON that contains the following fields:
 * "name"

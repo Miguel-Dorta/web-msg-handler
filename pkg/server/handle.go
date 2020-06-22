@@ -11,6 +11,7 @@ import (
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/sanitation"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -57,7 +58,8 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if content-type is valid
-	if contentType := r.Header.Get(mime.ContentType); contentType != mime.JSON {
+
+	if contentType := r.Header.Get(mime.ContentType); !strings.Contains(contentType, mime.JSON) {
 		log.Debugf("[Request %d] Invalid content type: %s", requestID, contentType)
 		statusWriter(w, ErrContentTypeNotAllowed)
 		return
