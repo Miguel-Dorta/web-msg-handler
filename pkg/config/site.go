@@ -12,7 +12,7 @@ import (
 // It consists in a RecaptchaSecret, a SenderName (that will match the name of a plugin)
 // and a ConfigJSON that will be generated from the settings.toml
 type Site struct {
-	RecaptchaSecret, SenderName, ConfigJSON string
+	RecaptchaSecret, WebUrl, SenderName, ConfigJSON string
 }
 
 // siteConfig is the internal type for unmarshalling the site configs.
@@ -20,6 +20,7 @@ type siteConfig struct {
 	ID              string                 `toml:"id"`
 	RecaptchaSecret string                 `toml:"recaptcha_secret"`
 	SenderType      string                 `toml:"sender_type"`
+	WebUrl          string                 `toml:"web_url"`
 	SenderConfig    map[string]interface{} `toml:"sender"`
 }
 
@@ -61,8 +62,13 @@ func LoadSites() (map[string]*Site, error) {
 			return nil, fmt.Errorf("error generating config JSON for plugin %s: %w", s.Name(), err)
 		}
 
+		if sc.WebUrl == "" {
+			sc.WebUrl = "*"
+		}
+
 		sitesMap[sc.ID] = &Site{
 			RecaptchaSecret: sc.RecaptchaSecret,
+			WebUrl:          sc.WebUrl,
 			SenderName:      sc.SenderType,
 			ConfigJSON:      string(configJSON),
 		}

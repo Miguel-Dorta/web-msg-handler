@@ -7,6 +7,9 @@ recaptcha_secret="xkmBhVrYaB0NhtHpHgAWeTnLZpTSxCKs0gigByk5"
 # Sender to use, it must match the name of a plugin in the "plugins" folder
 sender_type="mail"
 
+# Website URL for CORS Origin
+web_url="https://www.website2.org"
+
 # Sender specific settings (in this case, mail sender settings)
 [sender]
 website_name="My personal website" # Website name for identifying it

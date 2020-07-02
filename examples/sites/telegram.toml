@@ -7,6 +7,9 @@ recaptcha_secret="Uv38ByGCZU8WP18PmmIdcpVmx00QA3xNe7sEB9Hi"
 # Sender to use, it must match the name of a plugin in the "plugins" folder
 sender_type="telegram"
 
+# Website URL for CORS Origin
+web_url="https://www.website1.com"
+
 # Sender specific settings (in this case, telegram sender settings)
 [sender]
 website_name="My company's website" # Website name for identifying it
