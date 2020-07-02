@@ -1,9 +1,9 @@
 package config
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/pelletier/go-toml"
 	"io/ioutil"
 	"path/filepath"
 )
@@ -38,7 +38,7 @@ func Load() (*Config, error) {
 	}
 
 	var c Config
-	if err := json.Unmarshal(data, &c); err != nil {
+	if err := toml.Unmarshal(data, &c); err != nil {
 		return nil, fmt.Errorf("error parsing config: %w", err)
 	}
 
