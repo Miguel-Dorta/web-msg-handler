@@ -7,18 +7,30 @@ import (
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/mime"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
 // c is the common HTTP client for this package
 var c = &http.Client{Timeout: 10 * time.Second}
 
+//TODO decide if remove PostJSON. Not longer in use.
+
 // PostJSON makes a POST request to the URL provided with the JSON data provided.
 // It returns the data of the body of the response.
 func PostJSON(url string, data []byte) ([]byte, error) {
-	resp, err := c.Post(url, mime.JSON, bytes.NewReader(data))
+	return processResponse(c.Post(url, mime.JSON, bytes.NewReader(data)))
+}
+
+// PostJSON makes a POST request to the URL provided with the url form data provided.
+// It returns the data of the body of the response.
+func PostForm(url string, data url.Values) ([]byte, error) {
+	return processResponse(c.PostForm(url, data))
+}
+
+func processResponse(resp *http.Response, err error) ([]byte, error) {
 	if err != nil {
-		return nil, fmt.Errorf("failed http request: %s", err)
+		return nil, fmt.Errorf("http request failed: %s", err)
 	}
 	defer resp.Body.Close()
 

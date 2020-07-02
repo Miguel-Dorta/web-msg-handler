@@ -6,17 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Miguel-Dorta/web-msg-handler/pkg/client"
+	"net/url"
 	"strings"
 )
 
 const recaptchaVerifyUrl = "https://www.google.com/recaptcha/api/siteverify"
-
-// request represents the request that web-msg-handler do to Google's ReCaptcha servers in order to verify
-// whether a request passed the ReCaptcha verification.
-type request struct {
-	Secret string `json:"secret"`
-	Response string `json:"response"`
-}
 
 // response represents the response that Google's ReCaptcha servers returns telling if the request sent+
 // passes the ReCaptcha verification.
@@ -32,15 +26,11 @@ func CheckRecaptcha(secret, userResponse string) error {
 		return nil
 	}
 
-	data, err := json.Marshal(request{
-		Secret:   secret,
-		Response: userResponse,
-	})
-	if err != nil {
-		return fmt.Errorf("error parsing recaptcha request JSON: %s", err.Error())
-	}
+	data := url.Values{}
+	data.Set("secret", secret)
+	data.Set("response", userResponse)
 
-	rawResp, err := client.PostJSON(recaptchaVerifyUrl, data)
+	rawResp, err := client.PostForm(recaptchaVerifyUrl, data)
 	if err != nil {
 		return fmt.Errorf("error doing request for reCaptcha verification: %s", err.Error())
 	}

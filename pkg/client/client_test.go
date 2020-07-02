@@ -13,6 +13,8 @@ import (
 	"testing"
 )
 
+//TODO make test for PostForm
+
 func TestPostJSON(t *testing.T) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		errs := make([]string, 0, 4)
