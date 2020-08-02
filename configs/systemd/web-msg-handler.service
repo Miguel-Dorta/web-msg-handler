@@ -8,6 +8,11 @@ Type=simple
 Restart=on-failure
 TimeoutStopSec=10
 
+# Pre-execution setup
+PermissionsStartOnly=true
+ExecStartPre=/bin/mkdir -p /run/www-data
+ExecStartPre=/bin/chown www-data:www-data /run/www-data
+
 # Execution settings
 ExecStart=/opt/web-msg-handler/web-msg-handler
 WorkingDirectory=/var/www/web-msg-handler
