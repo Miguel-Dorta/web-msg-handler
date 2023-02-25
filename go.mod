@@ -5,7 +5,7 @@ require (
 	github.com/Miguel-Dorta/si v0.0.0-20200206205832-c3abcfc62378
 	github.com/pelletier/go-toml v1.8.0
 	github.com/spf13/cobra v0.0.5
-	golang.org/x/sys v0.0.0-20190712062909-fae7ac547cb7
+	golang.org/x/sys v0.1.0
 )
 
 go 1.14
